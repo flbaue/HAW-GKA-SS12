@@ -42,7 +42,7 @@ public class GraphParser {
             String strLine; //current line
             String firstLine = br.readLine(); //first line
             if (firstLine.matches("#ungerichtet")) {    //create undirected graph
-                result = new ListenableDirectedWeightedGraph(DefaultWeightedEdge.class);
+                result = new ListenableUndirectedWeightedGraph(DefaultWeightedEdge.class);
                 isDigraph = false;
             } else if (firstLine.matches("#gerichtet")) { //create digraph
                 result = new DefaultDirectedWeightedGraph(DefaultWeightedEdge.class);
@@ -67,7 +67,7 @@ public class GraphParser {
                 result.addVertex(a);
                 result.addVertex(b);
                 result.addEdge(a, b, GFactory.edge(Integer.parseInt(line[2]), a.name()+"-"+b.name()));
-                if (!isDigraph) {result.addEdge(b, a, GFactory.edge(Integer.parseInt(line[2]), b.name()+"-"+a.name()));};
+                //if (!isDigraph) {result.addEdge(b, a, GFactory.edge(Integer.parseInt(line[2]), b.name()+"-"+a.name()));};
                 System.out.println(strLine);
                 lineNo++;
             }
