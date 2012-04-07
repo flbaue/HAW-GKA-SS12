@@ -6,6 +6,7 @@
  */
 package utils;
 
+import gComponents.Edge;
 import gComponents.GFactory;
 import gComponents.Vertex;
 import java.io.*;
@@ -29,7 +30,7 @@ public class GraphParser {
      * @param graphFile: path of the file, that should be parsed
      * @return graph with weighted edges
      */
-    public static Graph<String, DefaultWeightedEdge> parse(String graphFile) {
+    public static Graph<Vertex, Edge> parse(String graphFile) {
         Graph result = null;    //retur-value
         Set<Vertex> vertices = new HashSet<>(); //collection of String-Names for vertices
         Set<String[]> edges = new HashSet<>();  //collection of String-Data for edges
@@ -63,8 +64,10 @@ public class GraphParser {
 //                edges.add(line);
                 Vertex a = GFactory.vertex(line[0]);
                 Vertex b = GFactory.vertex(line[1]);
+                result.addVertex(a);
                 result.addVertex(b);
-                result.addEdge(a, b, GFactory.edge((a.name()+"-"b.name()), Integer.parseInt(line[2])));
+                result.addEdge(a, b, GFactory.edge(Integer.parseInt(line[2]), a.name()+"-"+b.name()));
+                if (!isDigraph) {result.addEdge(b, a, GFactory.edge(Integer.parseInt(line[2]), b.name()+"-"+a.name()));};
                 System.out.println(strLine);
                 lineNo++;
             }

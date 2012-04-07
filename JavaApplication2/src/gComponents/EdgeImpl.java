@@ -45,7 +45,7 @@ class EdgeImpl implements Edge{
 
     @Override
     public String toString() {
-        return "Edge{"+value +";" + flow + ";" + name + '}';
+        return "Edge{n="+name+", v="+value +", f=" + flow +'}';
     }
     
     static Edge create(int value, String name) {

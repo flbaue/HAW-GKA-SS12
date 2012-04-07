@@ -63,7 +63,7 @@ class VertexImpl implements Vertex{
 
     @Override
     public String toString() {
-        return "Vertex{"+name+";"+"value"+"}";
+        return "Vertex{n="+name+", v="+value+"}";
     }
     
     

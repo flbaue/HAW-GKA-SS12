@@ -6,6 +6,9 @@
  */
 package start;
 
+import gComponents.Edge;
+import gComponents.GFactory;
+import gComponents.Vertex;
 import utils.GraphParser;
 import org.jgraph.JGraph;
 import org.jgrapht.Graph;
@@ -19,16 +22,15 @@ public class Start {
 
     public static void main(String[] args) {
         
-        Graph<String, DefaultWeightedEdge> myGraph = GraphParser.parse("src/graphFiles/graph_01.graph");
+        Graph<Vertex, Edge> myGraph = GraphParser.parse("src/graphFiles/graph_01.graph");
         System.err.println(myGraph);
         //GraphPainter.paint(myGraph);
         //Graph<String, DefaultWeightedEdge> myGraph = GraphParser.parse("src/graphFiles/graph_01_directed.graph");
         //Graph<String, DefaultWeightedEdge> myGraph = GraphParser.parse("src/graphFiles/graph_01_error1.graph");
         //Graph<String, DefaultWeightedEdge> myGraph = GraphParser.parse("src/graphFiles/graph_01_error2.graph");
         //Graph<String, DefaultWeightedEdge> myGraph = GraphParser.parse("src/graphFiles/graph_01_error3.graph");
-        System.err.println(myGraph);
-        System.err.println("H->L "+DijkstraShortestPath.findPathBetween(myGraph, "Hamburg", "Lüneburg"));
-        System.err.println("L->H "+DijkstraShortestPath.findPathBetween(myGraph, "Lüneburg", "Hamburg"));
+        System.err.println("H->L "+DijkstraShortestPath.findPathBetween(myGraph, GFactory.vertex("Hamburg"), GFactory.vertex("Lüneburg")));
+        System.err.println("L->H "+DijkstraShortestPath.findPathBetween(myGraph, GFactory.vertex("Lüneburg"), GFactory.vertex("Hamburg")));
         
         
 //        DirectedGraph<Integer, DefaultEdge> myGraph = new DefaultDirectedGraph<>(DefaultEdge.class);
