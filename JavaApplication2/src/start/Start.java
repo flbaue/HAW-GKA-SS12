@@ -33,7 +33,7 @@ public class Start {
 //            System.out.println(i++);
 //            System.out.println(it.next());
 //        }
-      
+
         
         System.out.println(new Breitensuche(myGraph));
         System.out.println(new Tiefensuche(myGraph));
