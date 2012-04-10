@@ -26,7 +26,6 @@ public class Start {
     public static void main(String[] args) {
         
         Graph<Vertex, Edge> myGraph = GraphParser.parse("src/graphFiles/graph_01.graph");
-      
 //        int i = 0;
 //        System.out.println("Breitensuche");
 //        for (Iterator it = new BreadthFirstIterator<Vertex, Edge>(myGraph); it.hasNext();) {
@@ -37,6 +36,6 @@ public class Start {
         
         System.out.println(new Breitensuche(myGraph));
         System.out.println(new Tiefensuche(myGraph));
-
+        
     }
 }
