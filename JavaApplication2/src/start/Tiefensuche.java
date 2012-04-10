@@ -57,12 +57,14 @@ public class Tiefensuche {
         
         //Hier wird die Ausgabe für toString zusammengebastelt. Dies passiert im Konstruktor, da
         // diese Klasse immutable ist und sich die Ausgabe im nachhinein nicht mehr ändert.
+        int counter = 1;
         StringBuilder sb = new StringBuilder("Tiefensuche! \nDer Graph besteht aus ");
         sb.append(Integer.toString(komponenten));
         sb.append(" Komponenten.\n");
         String nl = "\n";
         String x = "- ";
         for (Vertex vertex : vertexList) {
+            sb.append(String.format("%2d ", counter++));
             sb.append(x);
             sb.append(vertex);
             sb.append(nl);
