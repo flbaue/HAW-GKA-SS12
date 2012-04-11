@@ -6,26 +6,17 @@
  */
 package start;
 
-import gComponents.Edge;
-import gComponents.GFactory;
-import gComponents.Vertex;
-import java.util.Iterator;
-import utils.GraphParser;
-import org.jgraph.JGraph;
+
 import org.jgrapht.Graph;
-import org.jgrapht.alg.DijkstraShortestPath;
-import org.jgrapht.alg.KruskalMinimumSpanningTree;
-import org.jgrapht.ext.JGraphModelAdapter;
 import org.jgrapht.graph.DefaultWeightedEdge;
-import org.jgrapht.traverse.BreadthFirstIterator;
-import utils.GraphPainter;
+import utils.GraphParser;
 
 
 public class Start {
 
     public static void main(String[] args) {
         
-        Graph<Vertex, Edge> myGraph = GraphParser.parse("src/graphFiles/graph_01.graph");
+        Graph<String, DefaultWeightedEdge> myGraph = GraphParser.parse("src/graphFiles/graph_01.graph");
 //        int i = 0;
 //        System.out.println("Breitensuche");
 //        for (Iterator it = new BreadthFirstIterator<Vertex, Edge>(myGraph); it.hasNext();) {

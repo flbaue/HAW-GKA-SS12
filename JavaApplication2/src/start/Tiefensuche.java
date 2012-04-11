@@ -4,8 +4,7 @@
  */
 package start;
 
-import gComponents.Edge;
-import gComponents.Vertex;
+
 import java.util.*;
 import org.jgrapht.Graph;
 
@@ -13,17 +12,17 @@ import org.jgrapht.Graph;
  *
  * @author Tobi
  */
-public class Tiefensuche {
+public class Tiefensuche<V, E> {
     //=true setzten, um erweiterte Infos auf der Konsole auszugeben
     private final static boolean LOG = false;
     private final static Boolean FALSE = Boolean.FALSE;
     private final static Boolean TRUE = Boolean.TRUE;
     
     //Liste mit allen Ecken, in der Reienfolge, wie sie besucht wurden
-    private List<Vertex> vertexList;
+    private List<V> vertexList;
     private final String output;
             
-    public Tiefensuche(Graph<Vertex,Edge> graph){
+    public Tiefensuche(Graph<V,E> graph){
         if (LOG) System.out.println("##TIEFENSUCHE##");
         
         //Diese Liste enthält alle Ecken in genau der Reihenfolge, in der sie vom Algorithmus abgelaufen werden
@@ -37,13 +36,13 @@ public class Tiefensuche {
         //Map<Vertex, Boolean> visited = new HashMap<>();
         
         //Es wird über alle Ecken des Graphs iterriert
-        for (Vertex v : graph.vertexSet()) {
+        for (V v : graph.vertexSet()) {
             
             //Wenn eine Ecke noch nicht in der vertexList steht, dann wird diese als Start-Ecke für
             // den Algorithmus verwendet. Dies ist nur dann der Fall, wenn eine neue Zusammenhangs-
             // komponente des Graph abgearbeitet wird.
             if (!vertexList.contains(v)) {
-                Stack<Vertex> tmpStack = new Stack<>();
+                Stack<V> tmpStack = new Stack<>();
                 tmpStack.add(v);
                 if (LOG) System.out.println(v);
                 vertexList=dfs(tmpStack,vertexList, graph );
@@ -63,7 +62,7 @@ public class Tiefensuche {
         sb.append(" Komponenten.\n");
         String nl = "\n";
         String x = "- ";
-        for (Vertex vertex : vertexList) {
+        for (V vertex : vertexList) {
             sb.append(String.format("%2d ", counter++));
             sb.append(x);
             sb.append(vertex);
@@ -80,10 +79,10 @@ public class Tiefensuche {
      * @param l: Liste mit besuchten Ecken, in genau der Reihenfolge, in der sie besucht wurden
      * @param g: Graph, der traversiert werden soll
      */
-    private static List<Vertex> dfs(Stack<Vertex> s, List<Vertex> l, Graph<Vertex,Edge> g){
+    private List<V> dfs(Stack<V> s, List<V> l, Graph<V,E> g){
         
         // Liste mit den besuchten Ecken
-        List<Vertex> result;
+        List<V> result;
         
         if (LOG) System.out.println("Stack:   "+s);
         if (LOG) System.out.println("Besucht: "+l);
@@ -95,12 +94,13 @@ public class Tiefensuche {
         } else {
             //Die oberste Ecke wird vom Stack genommen. Von dieser Ecke aus werden die weiteren
             // Möglichkeiten zur Traversierung untersucht
-            Vertex v=s.pop();
+            V v=s.pop();
             //Diese Ecke wurde nun Besucht und wird somit der Ergebnisliste hinzugefügt.
             l.add(v);
             //Alle Nachbarn der aktuellen Liste werde auf den Stack gepackt
-            Set<Vertex> nSet = getAllNeigbors(g,v);
-            s.addAll(nSet);
+            List<V> nList = getAllNeigbors(g,v);
+            Collections.shuffle(nList);
+            s.addAll(nList);
             
             //Nun werden alle Ecken, die bereits besucht wurden vom Stack gelöscht, damit diese
             // nicht erneut bearbeitet werden.
@@ -118,22 +118,22 @@ public class Tiefensuche {
         return result;
     }
     
-    private static Set<Vertex> getAllNeigbors(Graph<Vertex,Edge> g, Vertex v){
+    private List<V> getAllNeigbors(Graph<V,E> g, V v){
         if (LOG) System.out.println("#########getAllNeigbors-START" + v);
         
         //Set, welches alle Nachbarn enthalten soll
-        Set<Vertex> result = new HashSet<>();
+        List<V> result = new ArrayList<>();
         
         //Set mit den angrenzenden Kanten der zu bearbeitenden Ecke
-        Set<Edge> edgesOfMainVertex = g.edgesOf(v);
+        Set<E> edgesOfMainVertex = g.edgesOf(v);
         
         // Nun wird über alle Ecken des Graphs traversiert
-        for (Vertex otherVertex : g.vertexSet()) {
+        for (V otherVertex : g.vertexSet()) {
             //Von jeder Ecke werden die angrenzenden Kanten gesammelt
-            Set<Edge> edgesOfOtherVertex = g.edgesOf(otherVertex);
+            Set<E> edgesOfOtherVertex = g.edgesOf(otherVertex);
             //Wenn beide Ecken gemeinsame Kanten haben, sind diese Ecken Nachbarn.
             // Deshalb wird die aktuelle Ecke zum Set der Nachbarn hinzugefügt
-            for (Edge edge : edgesOfMainVertex) {
+            for (E edge : edgesOfMainVertex) {
                 if (edgesOfOtherVertex.contains(edge)){
                     result.add(otherVertex);
                 }
@@ -152,7 +152,7 @@ public class Tiefensuche {
         return output;
     }
     
-    public List<Vertex> vertices(){
+    public List<V> vertices(){
         return new ArrayList(vertexList);
     }
 }

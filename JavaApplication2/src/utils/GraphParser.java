@@ -6,13 +6,18 @@
  */
 package utils;
 
-import gComponents.Edge;
-import gComponents.GFactory;
-import gComponents.Vertex;
-import java.io.*;
-import java.util.*;
-import org.jgrapht.*;
-import org.jgrapht.graph.*;
+
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.util.HashSet;
+import java.util.Set;
+import org.jgrapht.Graph;
+import org.jgrapht.WeightedGraph;
+import org.jgrapht.graph.DefaultDirectedWeightedGraph;
+import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.ListenableUndirectedWeightedGraph;
 
 /**
  *
@@ -30,10 +35,10 @@ public class GraphParser {
      * @param graphFile: path of the file, that should be parsed
      * @return graph with weighted edges
      */
-    public static Graph<Vertex, Edge> parse(String graphFile) {
-        Graph result = null;    //retur-value
-        Set<Vertex> vertices = new HashSet<>(); //collection of String-Names for vertices
-        Set<String[]> edges = new HashSet<>();  //collection of String-Data for edges
+    public static <E> Graph<String, E> parse(String graphFile) {
+        WeightedGraph result = null;    //retur-value
+        Set<String> vertices = new HashSet<>(); //collection of String-Names for vertices
+        Set<E[]> edges = new HashSet<>();  //collection of String-Data for edges
         boolean isDigraph = true;
         try {
             FileInputStream fstream = new FileInputStream(graphFile);
@@ -62,11 +67,18 @@ public class GraphParser {
 //                vertices.add(line[1]);
 //                if (!isDigraph) {};
 //                edges.add(line);
-                Vertex a = GFactory.vertex(line[0]);
-                Vertex b = GFactory.vertex(line[1]);
-                result.addVertex(a);
-                result.addVertex(b);
-                result.addEdge(a, b, GFactory.edge(Integer.parseInt(line[2]), a.name()+"-"+b.name()));
+//                V a = GFactory.vertex(line[0]);
+                String v1 = line[0];
+                result.addVertex(v1);
+//                V b = GFactory.vertex(line[1]);
+                String v2 = line[1];
+                result.addVertex(v2);
+//                result.addVertex(a);
+//                result.addVertex(b);
+                DefaultWeightedEdge edge = new DefaultWeightedEdge();
+                result.addEdge(v1, v2, edge);
+                result.setEdgeWeight(edge, Integer.parseInt(line[2]));
+                
                 //if (!isDigraph) {result.addEdge(b, a, GFactory.edge(Integer.parseInt(line[2]), b.name()+"-"+a.name()));};
                 System.out.println(strLine);
                 lineNo++;
@@ -76,20 +88,20 @@ public class GraphParser {
             System.err.println("Error: " + e.getMessage());
         }
         
-        //Add all vertices to graph
-        for (Vertex vertex : vertices) {
-            result.addVertex(vertex);
-        }
-        
-        //Add all edges to graph
-        for (String[] edge : edges) {
-            if (!result.addEdge(edge[0], edge[1], GFactory.edge(Integer.parseInt(edge[2])))) {
-                System.out.println(Arrays.toString(edge));
-            }
-        }
-        if (!isDigraph) for (String[] edge : edges) {
-            System.out.println(result.addEdge(edge[1], edge[0], GFactory.edge(Integer.parseInt(edge[2]))));
-        }
+//        //Add all vertices to graph
+//        for (String vertex : vertices) {
+//            result.addVertex(vertex);
+//        }
+//        
+//        //Add all edges to graph
+//        for (E[] edge : edges) {
+//            if (!result.addEdge(edge[0], edge[1], GFactory.edge(Integer.parseInt(edge[2])))) {
+//                System.out.println(Arrays.toString(edge));
+//            }
+//        }
+//        if (!isDigraph) for (E[] edge : edges) {
+//            System.out.println(result.addEdge(edge[1], edge[0], GFactory.edge(Integer.parseInt(edge[2]))));
+//        }
         return result;
     }
 }
