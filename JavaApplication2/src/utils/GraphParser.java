@@ -63,23 +63,17 @@ public class GraphParser {
                 //  array[0] = start; array[1] = end; array[2] = value;
                 String[] line = strLine.split(",");
                 if (line.length!=3) throw new Exception(String.format("Fehler in Datei: Zeile %d hat %d statt 3 Werte.", lineNo,line.length));
-//                vertices.add(line[0]);
-//                vertices.add(line[1]);
-//                if (!isDigraph) {};
-//                edges.add(line);
-//                V a = GFactory.vertex(line[0]);
+
                 String v1 = line[0];
                 result.addVertex(v1);
-//                V b = GFactory.vertex(line[1]);
+
                 String v2 = line[1];
                 result.addVertex(v2);
-//                result.addVertex(a);
-//                result.addVertex(b);
+
                 DefaultWeightedEdge edge = new DefaultWeightedEdge();
                 result.addEdge(v1, v2, edge);
                 result.setEdgeWeight(edge, Integer.parseInt(line[2]));
-                
-                //if (!isDigraph) {result.addEdge(b, a, GFactory.edge(Integer.parseInt(line[2]), b.name()+"-"+a.name()));};
+
                 System.out.println(strLine);
                 lineNo++;
             }
@@ -88,20 +82,6 @@ public class GraphParser {
             System.err.println("Error: " + e.getMessage());
         }
         
-//        //Add all vertices to graph
-//        for (String vertex : vertices) {
-//            result.addVertex(vertex);
-//        }
-//        
-//        //Add all edges to graph
-//        for (E[] edge : edges) {
-//            if (!result.addEdge(edge[0], edge[1], GFactory.edge(Integer.parseInt(edge[2])))) {
-//                System.out.println(Arrays.toString(edge));
-//            }
-//        }
-//        if (!isDigraph) for (E[] edge : edges) {
-//            System.out.println(result.addEdge(edge[1], edge[0], GFactory.edge(Integer.parseInt(edge[2]))));
-//        }
         return result;
     }
 }
