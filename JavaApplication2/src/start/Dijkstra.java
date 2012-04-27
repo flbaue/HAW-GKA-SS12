@@ -8,6 +8,6 @@ package start;
  *
  * @author Tobi
  */
-public class Dijkstra {
+public class Dijkstra<V, E> {
     
 }

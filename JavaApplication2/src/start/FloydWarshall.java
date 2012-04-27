@@ -4,10 +4,14 @@
  */
 package start;
 
+import org.jgrapht.Graph;
+
 /**
  *
  * @author Tobi
  */
-public class FloydWarshall {
+public class FloydWarshall<V, E> {
+    
+    
     
 }
