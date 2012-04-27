@@ -74,7 +74,7 @@ public class GraphParser {
                 result.addEdge(v1, v2, edge);
                 result.setEdgeWeight(edge, Integer.parseInt(line[2]));
 
-                System.out.println(strLine);
+//                System.out.println(strLine);
                 lineNo++;
             }
             in.close(); //Close the input stream
