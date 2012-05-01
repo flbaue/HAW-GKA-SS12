@@ -47,6 +47,7 @@ public class FloydWarshall<V, E> {
             vertex_id.put(vertex, x++);
         }
         
+
         //Anzahl der
         v=id_vertex.size();
         
@@ -60,7 +61,7 @@ public class FloydWarshall<V, E> {
             V iVertex = id_vertex.get(i);
             for (int j = 0; j < v; j++) {
                 
-                if (i==j){                                  //0 für i = j
+                if (i==j){          //0 für i = j
                     distanz.set(i, j, 0);
                 } else {
                     //Vertex zu i suchen
@@ -69,16 +70,16 @@ public class FloydWarshall<V, E> {
                     //Edge zwischen i und j auslesen
                     E ijEdge = graph.getEdge(iVertex, jVertex);
                     
-                    if (ijEdge!=null){                      //lij für vi_vj Element von E und i != j
+                    if (ijEdge!=null){      //lij für vi_vj Element von E und i != j
                         distanz.set(i, j, graph.getEdgeWeight(ijEdge));
                     } else {
-                        distanz.set(i,j,Integer.MAX_VALUE);
+                        distanz.set(i,j,Double.POSITIVE_INFINITY);
                     }
                 }
                 
             }
         }
-//        System.out.println("Vertices:\n"+id_vertex+"\nDistanzmatrix:\n"+distanz+"\nTransitmatrix:\n"+transit);
+        //System.out.println("Vertices:\n"+id_vertex+"\nDistanzmatrix:\n"+distanz+"\nTransitmatrix:\n"+transit);
         
         
         //###############
@@ -97,19 +98,23 @@ public class FloydWarshall<V, E> {
                          
                         // k != j
                         if (k!=j){
-                            System.out.println("Hier mal Werte für Konkrete Problemecken (if k = ? und i = ? und j = ?, then...) ausgeben lassen. Schlägt eventuell beim min etwas fehl?");
-                            double oldDik = distanz.get(i, k);
                             
+                            double originalDik = distanz.get(i, k);
+                            double dij = distanz.get(i, j);
+                            double djk = distanz.get(j, k);
+                            double alternativeDik = dij+djk;
+
+
                             //Setze dik := min(dik, dij+djk)
-                            distanz.set(i, k,Math.min(oldDik, distanz.get(i, j)+distanz.get(j, k)));
+                            double newDik = Math.min(originalDik, alternativeDik);
+                            distanz.set(i, k,newDik);
                             
                             //Falls dik verändert wurde, setze tik := j
-                            if (oldDik!=distanz.get(i, k)) {
+                            //if (originalDik!=distanz.get(i, k)) {
+                            if (originalDik>newDik){
                                 transit.set(i, k, j);
                             }
-//                            System.err.println("j="+j+"; i="+i+"; k="+k+"\nVertices:\n"+id_vertex+"\nDistanzmatrix:\n"+distanz+"\nTransitmatrix:\n"+transit);
-//                            System.err.println(oldDik);
-//                            System.err.println(distanz.get(i, k));
+
                         } else {
                             //k =j, also do nothing
                         }
@@ -126,15 +131,11 @@ public class FloydWarshall<V, E> {
                 }
              }
         }
-//        System.out.println("Vertices:\n"+id_vertex+"\nDistanzmatrix:\n"+distanz+"\nTransitmatrix:\n"+transit);
-        
-     
         
     }
     
     public GraphPath getShortestPath(V start, V end){
-        System.out.println("Vertices:\n"+id_vertex+/**"\nDistanzmatrix:\n"+distanz+"**/"\nTransitmatrix:\n"+transit);
-
+        
         checkVertex(start);
         checkVertex(end);
         
@@ -153,48 +154,50 @@ public class FloydWarshall<V, E> {
         }else{
             
             //Ecken, die auf dem Weg abgelaufen werden
-            List<V> pathVertices = new ArrayList<>();
-            
-            //Start und Ziel hinzufügen
-            pathVertices.add(start);
-            pathVertices.add(end);
+            List<V> pathVertices;
             
             
-            //IDs von Start- und Ziel-Ecke für Transitmatrix-Suche ermitteln
-            int startVertexID=vertex_id.get(start);
-            int endVertexId=vertex_id.get(end);
-            
-            //ID für die als nächste zu untersuchende Ecke ermittln
-            int currentV = transit.get(startVertexID, endVertexId);
-//            System.out.println(id_vertex);
-//            System.out.println(transit);
-//            System.out.println(pathVertices);
-//            System.out.println(currentV);
-            //Solange noch nicht alle Ecken emittelt...
-            while(currentV!=-1){
-                V elem = id_vertex.get(currentV);
-//                System.out.println(elem);
-                //... wird die aktuelle Ecke zum Pfad hinzugefügt...
-                pathVertices.add(1, elem);
-//                System.out.println(pathVertices);
-                //...und currentV = der nächsten zu untersuchenden Ecke gesetzt.
-                currentV = transit.get(startVertexID,vertex_id.get(elem));
-//                System.out.println("currentID: "+currentV+" Vertex: "+elem);
-               
-            }
-            
-            //System.out.println("Vertices:\n"+id_vertex+"\nDistanzmatrix:\n"+distanz+"\nTransitmatrix:\n"+transit);
+            pathVertices=collectAllVerticesBetween(start, end);
         
-            System.out.println(pathVertices);
             //Zu den Ecken des kürzesten Weges werden die zugehöriigen Kanten gesucht
             for (int i = 0; i < pathVertices.size()-1; i++) {
-                pathEdges.add(graph.getEdge(pathVertices.get(i), pathVertices.get(i+1)));
+                E edge = graph.getEdge(pathVertices.get(i), pathVertices.get(i+1));
+
+                pathEdges.add(edge);
             }
             //GraphPath Objekt erzeugen
             result = new GraphPathImpl(graph, start, end, pathEdges, getShortestDistance(start,end));
 
         }
         //GraphPath als Ergebnis zurückliefern
+        return result;
+    }
+    
+    private List<V> collectAllVerticesBetween(V start, V end){
+        List<V> result = new ArrayList<>();
+        result.add(start);
+        result.add(end);
+        result=collectAllVerticesBetween(result);
+        return result;
+    }
+    
+        private List<V> collectAllVerticesBetween(List<V> list){  
+        if (list.size()>2) throw new Error("List is to short. Need at least two elements.");
+        List<V> result = new ArrayList<>(list);
+
+        int  index = 0;
+        while (index<result.size()-1) {
+            int start=vertex_id.get(result.get(index));
+            int end=vertex_id.get(result.get(index+1));
+            int middle=transit.get(start, end);
+            if (middle!=-1){
+                result.add(index+1,id_vertex.get(middle));
+            } else {
+               index++; 
+            }
+        }
+
+        
         return result;
     }
     

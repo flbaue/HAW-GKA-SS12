@@ -51,7 +51,7 @@ public class DoubleSquareMatrix {
     public String toString(){
         String result = "";
         for (int m = 0; m < dim; m++) {
-            result += Arrays.toString(Arrays.copyOfRange(values, m*dim, (m*dim)+dim))+'\n';
+            result += m+Arrays.toString(Arrays.copyOfRange(values, m*dim, (m*dim)+dim))+'\n';
         }
         return result;
     }
