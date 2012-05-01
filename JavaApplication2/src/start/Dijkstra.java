@@ -6,6 +6,7 @@ package start;
 
 import java.util.*;
 import org.jgrapht.Graph;
+import org.jgrapht.UndirectedGraph;
 
 /**
  *
@@ -42,7 +43,7 @@ public class Dijkstra<V extends Comparable<? super V>, E> {
         
         while (!vertexQueue.isEmpty()) {
             V u = vertexQueue.poll();
-            if (myGraph== "undirected") {
+            if (myGraph instanceof UndirectedGraph) {
                 // Visit each edge exiting u
                 
                 List<V> neigbors = getAllNeigbors(myGraph, u);
