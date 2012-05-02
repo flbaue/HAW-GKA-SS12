@@ -150,8 +150,8 @@ public class FloydWarshall<V, E> {
         
         if (start.equals(end)) {//Trivialfall, wenn Start = Ende
             //GraphPath Objekt erzeugen
-            //result = new GraphPathImpl(graph, start, end,pathEdges, getShortestDistance(start,end));
-            result = null;
+            result = new GraphPathImpl(graph, start, end,pathEdges, getShortestDistance(start,end));
+            //result = null;
         }else{
             
             //Ecken, die auf dem Weg abgelaufen werden
@@ -234,4 +234,16 @@ public class FloydWarshall<V, E> {
             throw new Error("ID "+id+" is invalid");
         }
     }
+     
+     @Override
+     public String toString(){
+         String result="";
+         for (V v1 : vertex_id.keySet()) {
+             for (V v2 : vertex_id.keySet()) {
+                 GraphPath path = getShortestPath(v1, v2);
+                 result+= "From " + path.getStartVertex()+ " to "+ path.getEndVertex()+":\n"+path.toString()+" Distance is: "+path.getWeight()+"\n";
+            }
+         }
+         return result;
+     }
 }
