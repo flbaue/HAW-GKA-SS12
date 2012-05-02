@@ -6,146 +6,149 @@ package start;
 
 import java.util.*;
 import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
 import org.jgrapht.UndirectedGraph;
+import org.jgrapht.graph.GraphPathImpl;
 
 /**
  *
- * @author Tobi
+ * @author NO
  */
 public class Dijkstra<V extends Comparable<? super V>, E> {
-    
+
     Graph<V, E> myGraph;
-    private final static boolean LOG = false;
+    // Start Ecke
+    V start;
+    // um Graphen mit negativen Kanten zu merken
+    boolean negativeKanten = false;
+    // Liste alle Ecken
     List<V> vertexList;
+    // Die Map enthält alle Ecken und ihren entfernungen von start Ecke 
     Map<V, Double> minDistance = new HashMap();
-    // Vorgänger Vertex nach Dijkstra algo.
+    // Vorgänger-Ecke nach Dijkstra algorithmus
     Map<V, V> previous = new HashMap();
-    
-    public Dijkstra(Graph<V, E> myGraph) {
+
+    // Konstruktor (Graph, Start Ecke)
+    public Dijkstra(Graph<V, E> myGraph, V start) {
+        // setzt die Werte für die instance Variable
         this.myGraph = myGraph;
+        this.start = start;
+
+        // Liste alle Ecken füllen
         vertexList = new ArrayList(myGraph.vertexSet());
-        // Die Entfernung am Anfang auf unendlich setzen
+
+        // Die Ecken-Entfernungen von der start Ecke auf unendlich setzen
         for (V vertex : vertexList) {
-            minDistance.put(vertex, Double.MAX_VALUE);
+            minDistance.put(vertex, Double.POSITIVE_INFINITY);
         }
-        computePaths(vertexList.get(0));
-        for (V v : vertexList) {
-            System.out.println("Distance to " + v + ": " + minDistance.get(v));
-            List<V> path = getShortestPathTo(v);
-            System.out.println("Path: " + path);
-        }
+
+        // Berechnung der Pfade aus gehen von der start Ecke  
+        computePaths(start);
+
     }
-    
-    
-    
-    public void computePaths(V source) {
-        minDistance.put(source, 0.0);
+
+    public void computePaths(V start) {
+
+        // start Ecke Entfernung von sich selbst auf 0 setzen
+        minDistance.put(start, 0.0);
+
+        // Queue erstellen für die Bearbeitung aller Ecken
         PriorityQueue<V> vertexQueue = new PriorityQueue<V>();
-        vertexQueue.add(source);
-        
+
+        // Start Ecke in Queue hinzufügen
+        vertexQueue.add(start);
+
+        //Schleife die alle Ecken im Queue abarbeiten soll
         while (!vertexQueue.isEmpty()) {
-            V u = vertexQueue.poll();
-            if (myGraph instanceof UndirectedGraph) {
-                // Visit each edge exiting u
-                
-                List<V> neigbors = getAllNeigbors(myGraph, u);
-                for (V e :
-                        neigbors) {
-                    double weight =
-                            myGraph.getEdgeWeight(myGraph.getEdge(u, e));
-                    if (weight < 0) {
-                        System.out.println("Negative Kanten Gewicht sind nicht ünterstützt in Dijkstra Algorithmus");                        
-                        minDistance.clear();
-                        vertexList.clear();
-                        return;
-                    }
-                    double distanceThroughU =
-                            minDistance.get(u) + weight;
-                    if (distanceThroughU
-                            < minDistance.get(e)) {
-                        vertexQueue.remove(e);
-                        minDistance.put(e,
-                                distanceThroughU);
-                        previous.put(e, u);
-                        vertexQueue.add(e);
-                    }
+
+            // Start Ecke von Queue rausnehmen " als 'OK' gearbeitet markieren"
+            V vertex = vertexQueue.poll();
+
+            // alle Kanten aus einer Ecke durchlaufen
+            for (E edge : myGraph.edgesOf(vertex)) {
+
+                // End-ecke speicheren für gerichtete Graphen
+                V targetVertex = myGraph.getEdgeTarget(edge);
+
+                // End-ecke speicheren für ungerichtete Graphen, kanten in andere Richtung prüfen (Richtung spielt beim ungerichteten Graphen keine Rolle)
+                if (targetVertex.equals(vertex) && myGraph instanceof UndirectedGraph) {
+                    targetVertex = myGraph.getEdgeSource(edge);
                 }
-            } else {
-                for (E e : myGraph.edgesOf(u)) {
-                    V v = myGraph.getEdgeTarget(e);
-//                if (v.equals(u)){
-//                    v = myGraph.getEdgeSource(e);
-//                }
-                    double weight = myGraph.getEdgeWeight(e);
-                    if (weight < 0) {
-                        System.out.println("Negative Kanten Gewicht sind nicht ünterstützt in Dijkstra Algorithmus");
-                        minDistance.clear();
-                        vertexList.clear();
-                        return;
-                    }
-                    
-                    double distanceThroughU = minDistance.get(u) + weight;
-                    
-                    if (distanceThroughU < minDistance.get(v)) {
-                        vertexQueue.remove(v);
-                        minDistance.put(v, distanceThroughU);
-                        previous.put(v, u);
-                        vertexQueue.add(v);
-                    }
+
+                // Gewicht der Kante speicheren
+                double weight = myGraph.getEdgeWeight(edge);
+
+                // negative Kanten merken und die Berechnung abbrechen, damit keine endlöse Schleife auftrit
+                if (weight < 0) {
+                    this.negativeKanten = true;
+                    break;
+                }
+
+                //Entfernung aus der Start-ecke neu berechnen
+                double distanceThroughVertex = minDistance.get(vertex) + weight;
+
+                // vergleich kurzeste Weg bis zur End-ecke
+                if (distanceThroughVertex < minDistance.get(targetVertex)) {
+
+                    //End-ecke als bearbeitet "OK" markieren (aus Queue entfernen)
+                    vertexQueue.remove(targetVertex);
+
+                    //Entefrnung der End-ecke von der Start-ecke ersetzen
+                    minDistance.put(targetVertex, distanceThroughVertex);
+
+                    //Vorgängerecke der Endecke merken 
+                    previous.put(targetVertex, vertex);
+
+                    //Endecke neu hinzufügen falls andere mögliche kurzeste Wege existiert 
+                    vertexQueue.add(targetVertex);
                 }
             }
         }
-        
     }
-    
-    public List<V> getShortestPathTo(V target) {
+
+    // kurzeste Wege berechnen
+    public GraphPath getShortestPathTo(V target) {
+
+        // Liste enthält der Weg zwichen Start und Ziel Ecke
         List<V> path = new ArrayList<V>();
+
+        // Alle vorgänger Ecken der Ziel Ecke in eine Liste speicheren
         for (V vertex = target; vertex != null; vertex = previous.get(vertex)) {
             path.add(vertex);
         }
+
+        // Reinfolge umdrehen
         Collections.reverse(path);
-        return path;
-    }
-    
-    private List<V> getAllNeigbors(Graph<V, E> g, V v) {
-        if (LOG) {
-            System.out.println("#########getAllNeigbors-START" + v);
-        }
 
-        //Set, welches alle Nachbarn enthalten soll
-        List<V> result = new ArrayList<>();
-
-        //Set mit den angrenzenden Kanten der zu bearbeitenden Ecke
-        Set<E> edgesOfMainVertex = g.edgesOf(v);
+        //Liste enthält alle Kanten zwichen Start und Ziel Ecke
+        List<E> edgesList = new ArrayList();
         
-        for (E edge : edgesOfMainVertex) {
-            
-            if (g.getEdgeTarget(edge).equals(v)) {
-                result.add(g.getEdgeSource(edge));
-            } else {
-                result.add(g.getEdgeTarget(edge));
-            }
+        //Alle Kanten zwichen Start und Ziel Ecke in eine Liste speicheren
+        for (int i = 0; i < path.size() - 1; i++) {
+            edgesList.add(myGraph.getEdge(path.get(i), path.get(i + 1)));
         }
+        
+        // Weg züruckgeben
+        return new GraphPathImpl(myGraph, start, target, edgesList, minDistance.get(target));
+    }
 
-        /*
-         * // Nun wird über alle Ecken des Graphs traversiert for (V
-         * otherVertex : g.vertexSet()) { //Von jeder Ecke werden die
-         * angrenzenden Kanten gesammelt Set<E> edgesOfOtherVertex =
-         * g.edgesOf(otherVertex); //Wenn beide Ecken gemeinsame Kanten haben,
-         * sind diese Ecken Nachbarn. // Deshalb wird die aktuelle Ecke zum Set
-         * der Nachbarn hinzugefügt for (E edge : edgesOfMainVertex) {
-         *
-         * if (edgesOfOtherVertex.contains(edge)) { result.add(otherVertex); } }
-         * }
-         */
-        //Eine Ecke ist nicht mit sich selbst benachbart und wird deshalb entfernt
-        result.remove(v);
-        if (LOG) {
-            System.out.println(v + " hat folgende Nachbarn: " + result);
+    @Override
+    public String toString() {
+        
+        String result = "";
+        
+        // holt der Weg zwichen die Start Ecke und alle rest Ecken der Graph
+        for (V v : vertexList) {
+            GraphPath path = getShortestPathTo(v);
+            result += "From " + path.getStartVertex() + " To " + path.getEndVertex() + ":\n" + path + " Distance is: " + path.getWeight() + "\n";
         }
-        if (LOG) {
-            System.out.println("#########getAllNeigbors-End");
+        
+        // Beim Graphen mit negativen Kanten Warning zeigen
+        if (negativeKanten) {
+            result += "Negative Kanten werden nicht unterstützt bei Dijkstra.. Warnning!! falshe Ergibnisse ";
         }
+        
+        //kurzeste Wege von Start Ecke nach alle restliche Ecken des Graphs aus geben
         return result;
     }
 }

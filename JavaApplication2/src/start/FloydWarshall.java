@@ -124,7 +124,9 @@ public class FloydWarshall<V, E> {
                     //Falls dij < 0 ist, brich den Algorithmuss vorzeitig ab. (Es wurde ein
                     // Kreis negativer Länge gefunden.
                     if (distanz.get(i, i)<0.0d){
-                        throw new Error("Negative circle found for Vertex "+id_vertex.get(i));
+                        //throw new Error("Negative circle found for Vertex "+id_vertex.get(i));
+                        System.out.println("###############Negative circle found for Vertex "+id_vertex.get(i)+"ERGEBNISSE FALSCH!!!");
+                        return;
                     }
                 } else {
                     //i = j, also do nothing

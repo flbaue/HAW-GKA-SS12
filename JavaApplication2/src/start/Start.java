@@ -6,6 +6,7 @@
  */
 package start;
 
+import java.util.Set;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.FloydWarshallShortestPaths;
 import org.jgrapht.graph.DefaultWeightedEdge;
@@ -31,63 +32,89 @@ public class Start {
 
         //Praktikum 2
 
-//        System.out.println("undirected_cities");
-//        System.out.println(new Dijkstra(p1_undirected_cities));
-//        System.out.println();
-//        System.out.println("undirected_cities");
-//        System.out.println(new Dijkstra(p2_undirected_cities));
-//        System.out.println();
-//        System.out.println("directed");
-//        System.out.println(new Dijkstra(p2_directed));
-//        System.out.println();
-//        System.out.println("undirected_negCircle");
-//        System.out.println(new Dijkstra(p2_undirected_negCircle));
-//        System.out.println();
-//        System.out.println("undirected_negCircle_2components");
-//        System.out.println(new Dijkstra(p2_undirected_negCircle_2components));
-//        System.out.println();
-//        System.out.println("directed_negEdges");
-//        System.out.println(new Dijkstra(p2_directed_negEdges));
-//        System.out.println();
-//        System.out.println("directed_negCircle");
-//        System.out.println(new Dijkstra(p2_directed_negCircle));
-
         
-//         FloydWarshall fW01= new FloydWarshall(p1_undirected_cities);
-          FloydWarshall fW02= new FloydWarshall(p2_undirected_cities);
-//          FloydWarshall fW03= new FloydWarshall(p2_directed); // FloydWarshall
-//          fW04= new FloydWarshall(p2_undirected_negCircle); //Error, negativer
-//          Kreis // FloydWarshall fW05= new
-//          FloydWarshall(p2_undirected_negCircle_2components); //Error,
-//          negativer Kreis FloydWarshall fW06= new
-//          FloydWarshall(p2_directed_negEdges); // FloydWarshall fW07= new
-//          FloydWarshall(p2_directed_negCircle); //Error, negativer Kreis
+        String startV;
+        long startTime, endTime;
+        //Graph 01
+        Set<String> vertices01 = p1_undirected_cities.vertexSet();
+        startV="Augsburg";
+        System.out.println("Graph 01\n###############");
+        startTime = System.currentTimeMillis();
+        FloydWarshall fw01 = new FloydWarshall(p1_undirected_cities);
+        for (String endVertex : vertices01) {
+            System.out.println(fw01.getShortestPath(startV, endVertex));
+        }
+        endTime = System.currentTimeMillis()-startTime;
+        System.out.println(">>>>FloydWarshall benötigt "+endTime+" ms von "+startV+" zu allen Zielen");
+        
+        startTime = System.currentTimeMillis();
+        Dijkstra ds01 = new Dijkstra(p1_undirected_cities,startV);
+        for (String endVertex : vertices01) {
+            System.out.println(ds01.getShortestPathTo(endVertex));
+        }
+        endTime = System.currentTimeMillis()-startTime;
+        System.out.println(">>>>Dijkstra benötigt "+endTime+" ms von "+startV+" zu allen Zielen");    
+        
+        //Graph 02
+        Set<String> vertices02 = p2_undirected_cities.vertexSet();
+        startV="München";
+        System.out.println("Graph 02\n###############");
+        startTime = System.currentTimeMillis();
+        FloydWarshall fw02 = new FloydWarshall(p2_undirected_cities);
+        for (String endVertex : vertices02) {
+            System.out.println(fw02.getShortestPath(startV, endVertex));
+        }
+        endTime = System.currentTimeMillis()-startTime;
+        System.out.println(">>>>FloydWarshall benötigt "+endTime+" ms von "+startV+" zu allen Zielen");
+        
+        startTime = System.currentTimeMillis();
+        Dijkstra ds02 = new Dijkstra(p2_undirected_cities,startV);
+        for (String endVertex : vertices02) {
+            System.out.println(ds02.getShortestPathTo(endVertex));
+        }
+        endTime = System.currentTimeMillis()-startTime;
+        System.out.println(">>>>Dijkstra benötigt "+endTime+" ms von "+startV+" zu allen Zielen");
+        
+        //Graph 03
+        Set<String> vertices03 = p2_directed.vertexSet();
+        startV="s";
+        System.out.println("Graph 03\n###############");
+        startTime = System.currentTimeMillis();
+        FloydWarshall fw03 = new FloydWarshall(p2_directed);
+        for (String endVertex : vertices03) {
+            System.out.println(fw03.getShortestPath(startV, endVertex));
+        }
+        endTime = System.currentTimeMillis()-startTime;
+        System.out.println(">>>>FloydWarshall benötigt "+endTime+" ms von "+startV+" zu allen Zielen");
+        
+        startTime = System.currentTimeMillis();
+        Dijkstra ds03 = new Dijkstra(p2_directed,startV);
+        for (String endVertex : vertices03) {
+            System.out.println(ds03.getShortestPathTo(endVertex));
+        }
+        endTime = System.currentTimeMillis()-startTime;
+        System.out.println(">>>>Dijkstra benötigt "+endTime+" ms von "+startV+" zu allen Zielen");    
          
-          // fW03.getShortestDistance("a", "b"); //Error, a existier nicht //
-//          fW03.getShortestDistance("s", "b"); //Error, b existier nicht
-         
-//          FloydWarshallShortestPaths buildInFW = new
-//          FloydWarshallShortestPaths(p2_undirected_cities);
-//         
-//          System.out.println(fW02.getShortestPath("Kaiserslautern",
-//          "Rostock"));
-//          System.out.println(buildInFW.getShortestPath("Kaiserslautern",
-//          "Rostock"));
-//         
-//          System.out.println(fW02.getShortestPath("Augsburg", "Hamburg"));
-//          System.out.println(buildInFW.getShortestPath("Augsburg", "Hamburg"));
-//         
-//          System.out.println(fW02.getShortestPath("Karlsruhe", "Nürnberg"));
-//          System.out.println(buildInFW.getShortestPath("Karlsruhe",
-//          "Nürnberg"));
-         
-         
-//          FloydWarshallShortestPaths buildInFW6 = new
-//          FloydWarshallShortestPaths(p2_directed_negEdges);
-//          System.out.println(fW06.getShortestPath("v1", "v9"));
-//          System.out.println(buildInFW6.getShortestPath("v1", "v9"));
-         
-         
+        //Graph 05
+        Set<String> vertices05 = p2_undirected_negCircle_2components.vertexSet();
+        startV="v1";
+        System.out.println("Graph 05\n###############");
+        startTime = System.currentTimeMillis();
+        FloydWarshall fw05 = new FloydWarshall(p2_undirected_negCircle_2components);
+        for (String endVertex : vertices05) {
+            System.out.println(fw05.getShortestPath(startV, endVertex));
+            
+        }
+        endTime = System.currentTimeMillis()-startTime;
+        System.out.println(">>>>FloydWarshall benötigt "+endTime+" ms von "+startV+" zu allen Zielen");
+        
+        startTime = System.currentTimeMillis();
+        Dijkstra ds05 = new Dijkstra(p2_undirected_negCircle_2components,startV);
+        for (String endVertex : vertices05) {
+            System.out.println(ds05.getShortestPathTo(endVertex));
+        }
+        endTime = System.currentTimeMillis()-startTime;
+        System.out.println(">>>>Dijkstra benötigt "+endTime+" ms von "+startV+" zu allen Zielen");    
          
          
 
