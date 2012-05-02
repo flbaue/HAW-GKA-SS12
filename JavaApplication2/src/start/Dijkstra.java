@@ -36,6 +36,8 @@ public class Dijkstra<V extends Comparable<? super V>, E> {
         }
     }
     
+    
+    
     public void computePaths(V source) {
         minDistance.put(source, 0.0);
         PriorityQueue<V> vertexQueue = new PriorityQueue<V>();

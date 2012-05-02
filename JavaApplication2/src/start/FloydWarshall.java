@@ -134,6 +134,7 @@ public class FloydWarshall<V, E> {
         
     }
     
+    //Methode zum Abfragen des Pfads zwischen Start und Ziel
     public GraphPath getShortestPath(V start, V end){
         
         checkVertex(start);
