@@ -156,8 +156,8 @@ public class FloydWarshall<V, E> {
             //Ecken, die auf dem Weg abgelaufen werden
             List<V> pathVertices;
             
-            
-            pathVertices=collectAllVerticesBetween(start, end);
+            //Der Pfad zwischen Start und Ziel Ecke wird berechnet
+            pathVertices=calcPathVertices(start, end);
         
             //Zu den Ecken des kürzesten Weges werden die zugehöriigen Kanten gesucht
             for (int i = 0; i < pathVertices.size()-1; i++) {
@@ -173,15 +173,18 @@ public class FloydWarshall<V, E> {
         return result;
     }
     
-    private List<V> collectAllVerticesBetween(V start, V end){
+    
+    //Diese Methide ermittelt alle Ecken, die zwischen Start und End auf dem kürzesten Weg liegen
+    private List<V> calcPathVertices(V start, V end){
         List<V> result = new ArrayList<>();
         result.add(start);
         result.add(end);
-        result=collectAllVerticesBetween(result);
+        result=calcPathVertices(result);
         return result;
     }
     
-        private List<V> collectAllVerticesBetween(List<V> list){  
+    //Diese Methide ermittelt alle Ecken des kürzesten Weges zwischen allen aufeinanderfolgenden Ecken der Liste
+    private List<V> calcPathVertices(List<V> list){  
         if (list.size()>2) throw new Error("List is to short. Need at least two elements.");
         List<V> result = new ArrayList<>(list);
 
@@ -196,31 +199,38 @@ public class FloydWarshall<V, E> {
                index++; 
             }
         }
-
-        
         return result;
     }
     
+    
+    //Auslesen der Distanz zwischen start und end
     public double getShortestDistance(V start, V end){
         checkVertex(start);
         checkVertex(end);
         return distanz.get(vertex_id.get(start), vertex_id.get(end));
     }
     
-    private int getIDofVertex(V vertex){
+    //ID zur zugehörigen Vertex auslesen
+    private int getIdOfVertex(V vertex){
         checkVertex(vertex);
-        int result = -1;
-        for (Map.Entry<Integer, V> entry : id_vertex.entrySet()) {
-            if (entry.getValue().equals(vertex)){
-                result=entry.getKey();
-            }  
-        }
-        return result;
+        return vertex_id.get(vertex);
+    }
+    
+    //Vertex zur zugehörigen ID auslesen
+    private V getVertexOfId(int id){
+        checkId(id);
+        return id_vertex.get(id);
     }
     
     private void checkVertex(V vertex){
         if (!vertex_id.containsKey(vertex)){
             throw new Error("Vertex "+vertex+" is invalid");
+        }
+    }
+    
+     private void checkId(int id){
+        if (!id_vertex.containsKey(id)){
+            throw new Error("ID "+id+" is invalid");
         }
     }
 }
