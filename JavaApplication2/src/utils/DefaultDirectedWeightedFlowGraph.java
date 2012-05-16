@@ -17,13 +17,11 @@ import org.jgrapht.graph.DefaultDirectedWeightedGraph;
  *
  * @author Tobi
  */
-public class DefaultDirectedWeightedFlowGraph<V,E> implements WeightedGraph<V,E>, FlowGraph<V,E>, DirectedGraph<V, E>, Graph<V, E>,Cloneable, Serializable {
+public class DefaultDirectedWeightedFlowGraph<V, E> implements WeightedGraph<V, E>, FlowGraph<V, E>, DirectedGraph<V, E>, Graph<V, E>, Cloneable, Serializable {
 
     private final Map<E, Double> flow = new TreeMap<>();
     private final DefaultDirectedWeightedGraph<V, E> graph;
-    
     //~ Static fields/initializers ---------------------------------------------
-
     private static final long serialVersionUID = 1L;
     //~ Constructors -----------------------------------------------------------
 
@@ -32,8 +30,7 @@ public class DefaultDirectedWeightedFlowGraph<V,E> implements WeightedGraph<V,E>
      *
      * @param edgeClass class on which to base factory for edges
      */
-    public DefaultDirectedWeightedFlowGraph(Class<? extends E> edgeClass)
-    {
+    public DefaultDirectedWeightedFlowGraph(Class<? extends E> edgeClass) {
         this(new ClassBasedEdgeFactory<V, E>(edgeClass));
     }
 
@@ -42,26 +39,36 @@ public class DefaultDirectedWeightedFlowGraph<V,E> implements WeightedGraph<V,E>
      *
      * @param ef the edge factory of the new graph.
      */
-    public DefaultDirectedWeightedFlowGraph(EdgeFactory<V, E> ef)
-    {
+    public DefaultDirectedWeightedFlowGraph(EdgeFactory<V, E> ef) {
         this.graph = new DefaultDirectedWeightedGraph(ef);
-        
+
     }
-    
+
+    /**
+     * Initialis Kapazität .
+     *
+     */
+    public void initialiskapazitaet(Graph<V, E> graph) {
+        List<E> edgesList = new ArrayList(graph.edgeSet());
+
+        for (E edge : edgesList) {
+
+            this.setEdgeCapacity(edge, graph.getEdgeWeight(edge));
+        }
+    }
+
     /**
      * Creates a new directed weighted flow graph by wrapping an 
      * DefaultDirectedWeightedGraph<V,E>
      *
      * @param dWG the graph, which should be wrapped
      */
-    public DefaultDirectedWeightedFlowGraph(DefaultDirectedWeightedGraph<V,E> dWG)
-    {
+    public DefaultDirectedWeightedFlowGraph(DefaultDirectedWeightedGraph<V, E> dWG) {
         this.graph = dWG;
-        
+
     }
-    
+
     //~ Methods ----------------------------------------------------------------
-    
     @Override
     public void setEdgeWeight(E e, double weight) {
         graph.setEdgeWeight(e, weight);
@@ -211,9 +218,9 @@ public class DefaultDirectedWeightedFlowGraph<V,E> implements WeightedGraph<V,E>
     public double getEdgeFlow(E e) {
         return flow.get(e);
     }
-    
+
     @Override
-    public String toString(){
+    public String toString() {
         return graph.toString();
     }
 
@@ -242,8 +249,4 @@ public class DefaultDirectedWeightedFlowGraph<V,E> implements WeightedGraph<V,E>
         hash = 79 * hash + Objects.hashCode(this.graph);
         return hash;
     }
-    
-    
-    
-    
 }

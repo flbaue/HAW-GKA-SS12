@@ -6,6 +6,8 @@
  */
 package start;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import org.jgrapht.WeightedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
@@ -118,6 +120,12 @@ public class Start {
 //        }
 //        endTime = System.currentTimeMillis()-startTime;
 //        System.out.println(">>>>Dijkstra benötigt "+endTime+" ms von "+startV+" zu allen Zielen");    
+
+        
+        //Praktikum 3
+        
+        System.out.println(new Ford_Fulkerson(p3_directed_cities));
+        
 
 
         //Sandbox
