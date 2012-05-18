@@ -249,4 +249,12 @@ public class DefaultDirectedWeightedFlowGraph<V, E> implements WeightedGraph<V, 
         hash = 79 * hash + Objects.hashCode(this.graph);
         return hash;
     }
+
+    @Override
+    public void resetAllFlowsTo(double newFlowValueForAllGraphEdges) {
+        flow.clear();
+        for (E edge : graph.edgeSet()) {
+            setEdgeFlow(edge, newFlowValueForAllGraphEdges);
+        }
+    }
 }

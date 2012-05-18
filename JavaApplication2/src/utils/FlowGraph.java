@@ -19,4 +19,5 @@ public interface FlowGraph<V,E> extends Graph<V, E>, WeightedGraph<V, E>,  Direc
     public void setEdgeFlow(E e, double flow);
     public double getEdgeCapacity(E e);
     public double getEdgeFlow(E e);
+    public void resetAllFlowsTo(double newFlowValueForAllGraphEdges);
 }

@@ -27,7 +27,7 @@ public class Start {
         WeightedGraph<String, DefaultWeightedEdge> p2_directed_negEdges = GraphParser.parseDirected("src/graphFiles/graph_06.graph");
         WeightedGraph<String, DefaultWeightedEdge> p2_directed_negCircle = GraphParser.parseDirected("src/graphFiles/graph_07.graph");
         DefaultDirectedWeightedFlowGraph<String, DefaultWeightedEdge> p3_directed_cities = new DefaultDirectedWeightedFlowGraph<>(GraphParser.<DefaultWeightedEdge>parseDirected("src/graphFiles/graph_08.graph"));
-
+        DefaultDirectedWeightedFlowGraph<String, DefaultWeightedEdge> p3_directed_cities2 = new DefaultDirectedWeightedFlowGraph<>(GraphParser.<DefaultWeightedEdge>parseDirected("src/graphFiles/graph_08.graph"));
         
         System.out.println(p3_directed_cities);
 
@@ -125,6 +125,9 @@ public class Start {
         //Praktikum 3
         
         System.out.println(new Ford_Fulkerson(p3_directed_cities));
+        
+        p3_directed_cities2.resetAllFlowsTo(0.0);
+        EdmondsKarp ek1 = new EdmondsKarp(p3_directed_cities2, "Rostock", "München");
         
 
 
