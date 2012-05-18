@@ -125,8 +125,7 @@ public class Start {
         //Praktikum 3
         
         System.out.println(new Ford_Fulkerson(p3_directed_cities));
-        
-        p3_directed_cities2.resetAllFlowsTo(0.0);
+        System.out.println(p3_directed_cities2.edgesOf("Dortmund"));
         EdmondsKarp ek1 = new EdmondsKarp(p3_directed_cities2, "Rostock", "München");
         
 

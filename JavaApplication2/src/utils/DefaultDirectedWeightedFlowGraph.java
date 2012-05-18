@@ -19,7 +19,7 @@ import org.jgrapht.graph.DefaultDirectedWeightedGraph;
  */
 public class DefaultDirectedWeightedFlowGraph<V, E> implements WeightedGraph<V, E>, FlowGraph<V, E>, DirectedGraph<V, E>, Graph<V, E>, Cloneable, Serializable {
 
-    private final Map<E, Double> flow = new TreeMap<>();
+    private final Map<E, Double> flow = new HashMap<>();
     private final DefaultDirectedWeightedGraph<V, E> graph;
     //~ Static fields/initializers ---------------------------------------------
     private static final long serialVersionUID = 1L;
