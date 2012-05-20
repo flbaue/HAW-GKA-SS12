@@ -257,4 +257,9 @@ public class DefaultDirectedWeightedFlowGraph<V, E> implements WeightedGraph<V, 
             setEdgeFlow(edge, newFlowValueForAllGraphEdges);
         }
     }
+
+    @Override
+    public String getAllFlowsAsString() {
+        return this.flow.toString();
+    }
 }
