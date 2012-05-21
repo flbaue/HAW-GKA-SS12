@@ -18,10 +18,13 @@ public class EdmondsKarp<V, E> {
     private final FlowGraph<V, E> graph;
     private final V source;
     private final V target;
-    private final Map<V, Marks<V>> markedVertices;
-    private final Set<V> inspectedVertices;
-    private final Queue<V> verticesToInspect;
     private final double maxFlow;
+    private final Set<V> a;
+    private final Set<V> aComplement;
+    private final Set<E> minCut;
+    private final Set<E> minCutOutgoing;
+    private final Set<E> minCutIncomming;
+    private final double minCutCapacity;
     
 
     EdmondsKarp(FlowGraph<V, E> flowGraph, final V source, final V target) {
@@ -29,9 +32,9 @@ public class EdmondsKarp<V, E> {
         this.source=source;
         this.target=target;
         
-        this.markedVertices = new HashMap<>();
-        this.verticesToInspect = new LinkedList<>();
-        this.inspectedVertices = new HashSet();
+        final Map<V, Marks<V>> markedVertices = new HashMap<>();
+        final Queue<V> verticesToInspect = new LinkedList<>();
+        final Set<V> inspectedVertices = new HashSet();
         
         
         //####################
@@ -52,6 +55,7 @@ public class EdmondsKarp<V, E> {
         
 //        (a) Falls alle markierten Ecken inspiziert wurden, gehe nach 4.
         while(!inspectedVertices.containsAll(markedVertices.keySet())){
+            if (TRACE) System.err.println(String.format("Inspecting %s:", verticesToInspect.element().toString()));
 //            (b) Wähle aus der Queue die markierte, aber noch nicht inspizierte Ecke v_i
 //                und inspiziere sie wie folgt (Berechnung des Inkrements)
             V v_i = verticesToInspect.remove();
@@ -61,7 +65,7 @@ public class EdmondsKarp<V, E> {
 //            Ecke v_j und f(e_ij ) < c(e_ij ) markiere v_j mit (+v_i , δ_j ), wobei δ_j
 //            die kleinere der beiden Zahlen c(e_ij ) − f(e_ij ) und δ_i ist.
             Set<E> forwardEdges = graph.outgoingEdgesOf(v_i); //O(v_i )
-            if (TRACE) System.err.println("Forward: "+forwardEdges);
+            if (TRACE) System.err.println(" Forward: "+forwardEdges);
             for (E e_ij : forwardEdges) { //e_ij ∈ O(v_i )
                 V v_j = graph.getEdgeTarget(e_ij); 
                 if (!markedVertices.containsKey(v_j)) {//mit unmarkierter Ecke v_j
@@ -80,7 +84,7 @@ public class EdmondsKarp<V, E> {
 //            Ecke v_j und f(e_ji ) > 0 markiere v_j mit (−v_i , δ_j ), wobei δ_j die
 //            kleinere der beiden Zahlen f(e_ij ) und δ_i ist.
             Set<E> backwardEdges = graph.incomingEdgesOf(v_i);
-            if (TRACE) System.err.println("Backward: "+backwardEdges);//I(v_i )
+            if (TRACE) System.err.println(" Backward: "+backwardEdges);//I(v_i )
             for (E e_ij : forwardEdges) { //e_ji ∈ I(v_i )
                 V v_j = graph.getEdgeSource(e_ij); 
                 if (!markedVertices.containsKey(v_j)) {//mit unmarkierter Ecke v_j
@@ -107,11 +111,12 @@ public class EdmondsKarp<V, E> {
                 V vertex_j = this.target;
                 V vertex_i = markedVertices.get(vertex_j).getPrev();
                 double delta = markedVertices.get(target).getDelta();
+                if (TRACE) System.err.println(String.format("Change flow about %f",delta));
                 
                 while (vertex_i!=null){
                     Marks jMarks = markedVertices.get(vertex_j);
                     E e = (jMarks.getEdgeDirection()==Marks.FORWARD) ? graph.getEdge(vertex_i, vertex_j) : graph.getEdge(vertex_j, vertex_i);
-                    if (TRACE) System.err.println(vertex_j + ": " + jMarks);
+                    if (TRACE) System.err.println(String.format(" %s: %s",vertex_j.toString(),jMarks.toString()));
                     double oldFlow = graph.getEdgeFlow(e);
                     double newFlow = oldFlow+(jMarks.getEdgeDirection()*delta);
                     graph.setEdgeFlow(e, newFlow);
@@ -125,107 +130,152 @@ public class EdmondsKarp<V, E> {
                 verticesToInspect.add(source);
             }
         }
+        
         //###########################
         //#4. Kein Vergrößernder Weg#
         //###########################
-        if (TRACE) System.err.println(">>>>>>>>>>>>>>KeinVergrößernderWeg");
+        if (TRACE) System.err.println("####Kein Vergrößernder Weg! Ende!####");
         double tmpFlow = 0.0;
+        
+        //Setzen von Instanz-Variablen
+        
+        // maxFlow:
         for (E edge : graph.outgoingEdgesOf(this.source)) {
             tmpFlow += graph.getEdgeFlow(edge);
         }
-        maxFlow = tmpFlow;
-        if (TRACE) System.err.println(verticesToInspect);
-        if (TRACE) System.err.println(inspectedVertices);
-        if (TRACE) System.err.println(markedVertices);
-        if (TRACE) System.err.println(graph.getAllFlowsAsString());
+        this.maxFlow = tmpFlow;
+        
+        // a:
+        this.a = new HashSet<>(markedVertices.keySet());
+
+        // aComplement:
+        this.aComplement = new HashSet<>(graph.vertexSet());
+        this.aComplement.removeAll(a);
+        
+        // minCutIncomming
+        this.minCutIncomming = calcMinCutIncoming();
+        
+        // minCutIncomming
+        this.minCutOutgoing = calcMinCutOutgoing();
+        
+        // minCut:
+        this.minCut = calcMinCut();
+        
+        // minCutCapacity
+        this.minCutCapacity = calcMinCutCapacity();
+        
+        //Berechnung von MaxFlow, basierend auf dem minimalen Schnitt (dient eher der Kontrolle)
+        double maxFlowOfCut = calcMaxFlowBasedOnMinCut();
+        
+        isMaxFlowMinCutTheoremfulfilled();
+        
+        if (TRACE) System.err.println(" Zu inspizierende Ecken: "+verticesToInspect);
+        if (TRACE) System.err.println(" Inspizierte Ecken: "+inspectedVertices);
+        if (TRACE) System.err.println(" Markierte Ecken: "+markedVertices);
+        if (TRACE) System.err.println(" Alle Fluss-Werte: "+graph.getAllFlowsAsString());
+        if (TRACE) System.err.println(" MinCut: " + minCut);
+        if (TRACE) System.err.println(" MinCutOutgoing: " + minCutOutgoing);
+        if (TRACE) System.err.println(" MinCutIncoming: " + minCutIncomming);
+        if (TRACE) System.err.println(" MinCutCapacity: "+ minCutCapacity);
+        if (TRACE) System.err.println(" MaxFlow, calculated based on source outgoing flow: "+ maxFlow);
+        if (TRACE) System.err.println(" MinFlow, calculated based on minCut: "+maxFlowOfCut);
     }
     
 
-    public double maxFlow(){
+    public double getMaxFlow(){
         return maxFlow;
     }
-    
-    private V tempFehlersuche(){
-        for (V v : graph.vertexSet()) {
-            if (v.equals("Dortmund")) return v;
-        }
-        return null;
+
+    public Set<V> getA() {
+        return new HashSet<>(a);
     }
-    
-    
-//    private class Marks{
-//        public static final int FORWARD = 1;
-//        public static final int BACKWARD = -1;
-//        private int edgeDirection;
-//        private V prev;
-//        private double delta;
-//        
-//        public Marks(int edgeDirection,V prev, double delta){
-//            if ((edgeDirection!=FORWARD)&&(edgeDirection!=BACKWARD)){
-//                throw new Error("edgeDirection has to be 1 or -1");
-//            }
-//            this.edgeDirection = edgeDirection;
-//            this.prev = prev;
-//            this.delta = delta;
-//        }
-//
-//        public double getDelta() {
-//            return delta;
-//        }
-//
-//        public int getEdgeDirection() {
-//            return edgeDirection;
-//        }
-//
-//        public V getPrev() {
-//            return prev;
-//        }
-//
-//        public void setDelta(double delta) {
-//            this.delta = delta;
-//        }
-//
-//        public void setEdgeDirection(int edgeDirection) {
-//            this.edgeDirection = edgeDirection;
-//        }
-//
-//        public void setPrev(V prev) {
-//            this.prev = prev;
-//        }
-//
-//        @Override
-//        public boolean equals(Object obj) {
-//            if (obj == null) {
-//                return false;
-//            }
-//            if (getClass() != obj.getClass()) {
-//                return false;
-//            }
-//            final Marks other = (Marks) obj;
-//            if (this.edgeDirection != other.edgeDirection) {
-//                return false;
-//            }
-//            if (!Objects.equals(this.prev, other.prev)) {
-//                return false;
-//            }
-//            if (Double.doubleToLongBits(this.delta) != Double.doubleToLongBits(other.delta)) {
-//                return false;
-//            }
-//            return true;
-//        }
-//
-//        @Override
-//        public int hashCode() {
-//            int hash = 5;
-//            hash = 29 * hash + this.edgeDirection;
-//            hash = 29 * hash + Objects.hashCode(this.prev);
-//            hash = 29 * hash + (int) (Double.doubleToLongBits(this.delta) ^ (Double.doubleToLongBits(this.delta) >>> 32));
-//            return hash;
-//        }
-//        
-//        @Override
-//        public String toString(){
-//            return String.format("[Markierung: %s%s, %f]", (edgeDirection==FORWARD)?"+":"-",(prev==null)?"null":prev.toString(), delta);
-//        }
-//    }
+
+    public Set<V> getaComplement() {
+        return new HashSet<>(aComplement);
+    }
+
+    public Set<E> getMinCut() {
+        return new HashSet<>(minCut);
+    }
+
+    public double getMinCutCapacity() {
+        return minCutCapacity;
+    }
+
+    public Set<E> getMinCutIncomming() {
+        return new HashSet<>(minCutIncomming);
+    }
+
+    public Set<E> getMinCutOutgoing() {
+        return new HashSet<>(minCutOutgoing);
+    }
+
+    public V getSource() {
+        return source;
+    }
+
+    public V getTarget() {
+        return target;
+    }
+
+    private Set<E> calcMinCut() {
+        Set<E> result = new HashSet<>(minCutOutgoing);
+        result.addAll(minCutIncomming);
+        return result;
+    }
+
+    private Set<E> calcMinCutIncoming() {
+        Set<E> result = new HashSet<>();
+        for (V v1 : a) {
+            Set<E> v1In = new HashSet<>(graph.incomingEdgesOf(v1));
+            for (V v2 : aComplement) {
+                Set<E> v2Out = new HashSet<>(graph.outgoingEdgesOf(v2));
+                v2Out.retainAll(v1In);
+                result.addAll(v2Out);
+            }
+        }
+        return result;
+    }
+
+    private Set<E> calcMinCutOutgoing() {
+        Set<E> result = new HashSet<>();
+        for (V v1 : a) {
+            Set<E> v1Out = new HashSet<>(graph.outgoingEdgesOf(v1));
+            for (V v2 : aComplement) {
+                Set<E> v2In = new HashSet<>(graph.incomingEdgesOf(v2));
+                v2In.retainAll(v1Out);
+                result.addAll(v2In);
+            }
+        }
+        return result;
+    }
+
+    private double calcMinCutCapacity() {
+        double result = 0.0;
+        for (E e : minCutOutgoing) {
+            result+= graph.getEdgeCapacity(e);
+        }
+        return result;
+    }
+
+    private double calcMaxFlowBasedOnMinCut() {
+        double result;
+        double f_aPlus = 0.0;
+        for (E e : minCutOutgoing) {
+            f_aPlus+= graph.getEdgeFlow(e);
+        }
+        double f_aMinus = 0.0;
+        for (E e : minCutIncomming) {
+            f_aMinus+= graph.getEdgeFlow(e);
+        }
+        result = f_aPlus - f_aMinus;
+        return result;
+    }
+
+    private void isMaxFlowMinCutTheoremfulfilled() {
+        boolean conditionResult = (maxFlow == minCutCapacity);
+        if (!conditionResult){
+            throw new Error("Maximaler-Fluss-Minimaler-Schnitt-Theorem ist nicht erfüllt. Werte sind nicht gleich!");
+        }
+    }
 }
