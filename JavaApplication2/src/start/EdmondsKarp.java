@@ -167,7 +167,7 @@ public class EdmondsKarp<V, E> {
         //Berechnung von MaxFlow, basierend auf dem minimalen Schnitt (dient eher der Kontrolle)
         double maxFlowOfCut = calcMaxFlowBasedOnMinCut();
         
-        isMaxFlowMinCutTheoremfulfilled();
+        checkMaxFlowMinCutTheorem();
         
         if (TRACE) System.err.println(" Zu inspizierende Ecken: "+verticesToInspect);
         if (TRACE) System.err.println(" Inspizierte Ecken: "+inspectedVertices);
@@ -272,7 +272,7 @@ public class EdmondsKarp<V, E> {
         return result;
     }
 
-    private void isMaxFlowMinCutTheoremfulfilled() {
+    private void checkMaxFlowMinCutTheorem() {
         boolean conditionResult = (maxFlow == minCutCapacity);
         if (!conditionResult){
             throw new Error("Maximaler-Fluss-Minimaler-Schnitt-Theorem ist nicht erfüllt. Werte sind nicht gleich!");
