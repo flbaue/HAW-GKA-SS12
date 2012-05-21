@@ -126,7 +126,7 @@ public class Start {
         
         System.out.println(new Ford_Fulkerson(p3_directed_cities));
         EdmondsKarp ek1 = new EdmondsKarp(p3_directed_cities2, "Rostock", "München");
-        System.out.println(ek1.getMaxFlow());
+        System.out.println(ek1);
         
 
 

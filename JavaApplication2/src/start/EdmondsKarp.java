@@ -278,4 +278,15 @@ public class EdmondsKarp<V, E> {
             throw new Error("Maximaler-Fluss-Minimaler-Schnitt-Theorem ist nicht erfüllt. Werte sind nicht gleich!");
         }
     }
+    
+    @Override
+    public String toString(){
+        StringBuilder result = new StringBuilder();
+        final String nl = "\n ";
+        result.append("Edmonds & Karp Algorithmus:\n Graph: ");
+        result.append(graph).append(nl);
+        result.append("MaxFlow: ").append(maxFlow).append(nl);
+        result.append("MinCut: ").append(minCut);
+        return result.toString();
+    }
 }
