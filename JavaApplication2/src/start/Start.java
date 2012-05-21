@@ -124,9 +124,10 @@ public class Start {
         
         //Praktikum 3
         
-        System.out.println(new Ford_Fulkerson(p3_directed_cities));
         EdmondsKarp ek1 = new EdmondsKarp(p3_directed_cities2, "Rostock", "München");
         System.out.println(ek1);
+        Ford_Fulkerson fF1 = new Ford_Fulkerson(p3_directed_cities2, "Rostock", "München");
+        System.out.println(fF1);
         
 
 
