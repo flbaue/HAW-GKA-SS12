@@ -6,6 +6,7 @@ package start;
 
 import java.util.*;
 import utils.FlowGraph;
+import utils.Marks;
 
 /**
  *
@@ -13,12 +14,14 @@ import utils.FlowGraph;
  */
 public class EdmondsKarp<V, E> {
 
+    private final boolean TRACE = false;
     private final FlowGraph<V, E> graph;
     private final V source;
     private final V target;
-    private final Map<V, Marks> markedVertices;
+    private final Map<V, Marks<V>> markedVertices;
     private final Set<V> inspectedVertices;
     private final Queue<V> verticesToInspect;
+    private final double maxFlow;
     
 
     EdmondsKarp(FlowGraph<V, E> flowGraph, final V source, final V target) {
@@ -58,7 +61,7 @@ public class EdmondsKarp<V, E> {
 //            Ecke v_j und f(e_ij ) < c(e_ij ) markiere v_j mit (+v_i , δ_j ), wobei δ_j
 //            die kleinere der beiden Zahlen c(e_ij ) − f(e_ij ) und δ_i ist.
             Set<E> forwardEdges = graph.outgoingEdgesOf(v_i); //O(v_i )
-            System.err.println("Forward: "+forwardEdges);
+            if (TRACE) System.err.println("Forward: "+forwardEdges);
             for (E e_ij : forwardEdges) { //e_ij ∈ O(v_i )
                 V v_j = graph.getEdgeTarget(e_ij); 
                 if (!markedVertices.containsKey(v_j)) {//mit unmarkierter Ecke v_j
@@ -77,7 +80,7 @@ public class EdmondsKarp<V, E> {
 //            Ecke v_j und f(e_ji ) > 0 markiere v_j mit (−v_i , δ_j ), wobei δ_j die
 //            kleinere der beiden Zahlen f(e_ij ) und δ_i ist.
             Set<E> backwardEdges = graph.incomingEdgesOf(v_i);
-            System.err.println("Backward: "+backwardEdges);//I(v_i )
+            if (TRACE) System.err.println("Backward: "+backwardEdges);//I(v_i )
             for (E e_ij : forwardEdges) { //e_ji ∈ I(v_i )
                 V v_j = graph.getEdgeSource(e_ij); 
                 if (!markedVertices.containsKey(v_j)) {//mit unmarkierter Ecke v_j
@@ -101,15 +104,16 @@ public class EdmondsKarp<V, E> {
                 //#3. Vergrößerung der Flußstärke#
                 //################################
                 
-                V vertex_j = target;
+                V vertex_j = this.target;
                 V vertex_i = markedVertices.get(vertex_j).getPrev();
+                double delta = markedVertices.get(target).getDelta();
                 
                 while (vertex_i!=null){
                     Marks jMarks = markedVertices.get(vertex_j);
-                    E e = (jMarks.edgeDirection==Marks.FORWARD) ? graph.getEdge(vertex_i, vertex_j) : graph.getEdge(vertex_j, vertex_i);
-                    System.err.println(vertex_j + ": " + jMarks);
+                    E e = (jMarks.getEdgeDirection()==Marks.FORWARD) ? graph.getEdge(vertex_i, vertex_j) : graph.getEdge(vertex_j, vertex_i);
+                    if (TRACE) System.err.println(vertex_j + ": " + jMarks);
                     double oldFlow = graph.getEdgeFlow(e);
-                    double newFlow = oldFlow+(jMarks.edgeDirection*jMarks.delta);
+                    double newFlow = oldFlow+(jMarks.getEdgeDirection()*delta);
                     graph.setEdgeFlow(e, newFlow);
                     vertex_j=vertex_i;
                     vertex_i=markedVertices.get(vertex_j).getPrev();
@@ -124,95 +128,104 @@ public class EdmondsKarp<V, E> {
         //###########################
         //#4. Kein Vergrößernder Weg#
         //###########################
-        System.err.println(">>>>>>>>>>>>>>KeinVergrößernderWeg");
-        System.err.println(verticesToInspect);
-        System.err.println(inspectedVertices);
-        System.err.println(markedVertices);
-        System.err.println(graph.getAllFlowsAsString());
+        if (TRACE) System.err.println(">>>>>>>>>>>>>>KeinVergrößernderWeg");
+        double tmpFlow = 0.0;
+        for (E edge : graph.outgoingEdgesOf(this.source)) {
+            tmpFlow += graph.getEdgeFlow(edge);
+        }
+        maxFlow = tmpFlow;
+        if (TRACE) System.err.println(verticesToInspect);
+        if (TRACE) System.err.println(inspectedVertices);
+        if (TRACE) System.err.println(markedVertices);
+        if (TRACE) System.err.println(graph.getAllFlowsAsString());
     }
     
 
-     private V tempFehlersuche(){
-         for (V v : graph.vertexSet()) {
-             if (v.equals("Dortmund")) return v;
-         }
-         return null;
-     }
-    
-    
-    private class Marks{
-        public static final int FORWARD = 1;
-        public static final int BACKWARD = -1;
-        private int edgeDirection;
-        private V prev;
-        private double delta;
-        
-        public Marks(int edgeDirection,V prev, double delta){
-            if ((edgeDirection!=FORWARD)&&(edgeDirection!=BACKWARD)){
-                throw new Error("edgeDirection has to be 1 or -1");
-            }
-            this.edgeDirection = edgeDirection;
-            this.prev = prev;
-            this.delta = delta;
-        }
-
-        public double getDelta() {
-            return delta;
-        }
-
-        public int getEdgeDirection() {
-            return edgeDirection;
-        }
-
-        public V getPrev() {
-            return prev;
-        }
-
-        public void setDelta(double delta) {
-            this.delta = delta;
-        }
-
-        public void setEdgeDirection(int edgeDirection) {
-            this.edgeDirection = edgeDirection;
-        }
-
-        public void setPrev(V prev) {
-            this.prev = prev;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == null) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
-            final Marks other = (Marks) obj;
-            if (this.edgeDirection != other.edgeDirection) {
-                return false;
-            }
-            if (!Objects.equals(this.prev, other.prev)) {
-                return false;
-            }
-            if (Double.doubleToLongBits(this.delta) != Double.doubleToLongBits(other.delta)) {
-                return false;
-            }
-            return true;
-        }
-
-        @Override
-        public int hashCode() {
-            int hash = 5;
-            hash = 29 * hash + this.edgeDirection;
-            hash = 29 * hash + Objects.hashCode(this.prev);
-            hash = 29 * hash + (int) (Double.doubleToLongBits(this.delta) ^ (Double.doubleToLongBits(this.delta) >>> 32));
-            return hash;
-        }
-        
-        @Override
-        public String toString(){
-            return String.format("[Markierung: %s%s, %f]", (edgeDirection==FORWARD)?"+":"-",(prev==null)?"null":prev.toString(), delta);
-        }
+    public double maxFlow(){
+        return maxFlow;
     }
+    
+    private V tempFehlersuche(){
+        for (V v : graph.vertexSet()) {
+            if (v.equals("Dortmund")) return v;
+        }
+        return null;
+    }
+    
+    
+//    private class Marks{
+//        public static final int FORWARD = 1;
+//        public static final int BACKWARD = -1;
+//        private int edgeDirection;
+//        private V prev;
+//        private double delta;
+//        
+//        public Marks(int edgeDirection,V prev, double delta){
+//            if ((edgeDirection!=FORWARD)&&(edgeDirection!=BACKWARD)){
+//                throw new Error("edgeDirection has to be 1 or -1");
+//            }
+//            this.edgeDirection = edgeDirection;
+//            this.prev = prev;
+//            this.delta = delta;
+//        }
+//
+//        public double getDelta() {
+//            return delta;
+//        }
+//
+//        public int getEdgeDirection() {
+//            return edgeDirection;
+//        }
+//
+//        public V getPrev() {
+//            return prev;
+//        }
+//
+//        public void setDelta(double delta) {
+//            this.delta = delta;
+//        }
+//
+//        public void setEdgeDirection(int edgeDirection) {
+//            this.edgeDirection = edgeDirection;
+//        }
+//
+//        public void setPrev(V prev) {
+//            this.prev = prev;
+//        }
+//
+//        @Override
+//        public boolean equals(Object obj) {
+//            if (obj == null) {
+//                return false;
+//            }
+//            if (getClass() != obj.getClass()) {
+//                return false;
+//            }
+//            final Marks other = (Marks) obj;
+//            if (this.edgeDirection != other.edgeDirection) {
+//                return false;
+//            }
+//            if (!Objects.equals(this.prev, other.prev)) {
+//                return false;
+//            }
+//            if (Double.doubleToLongBits(this.delta) != Double.doubleToLongBits(other.delta)) {
+//                return false;
+//            }
+//            return true;
+//        }
+//
+//        @Override
+//        public int hashCode() {
+//            int hash = 5;
+//            hash = 29 * hash + this.edgeDirection;
+//            hash = 29 * hash + Objects.hashCode(this.prev);
+//            hash = 29 * hash + (int) (Double.doubleToLongBits(this.delta) ^ (Double.doubleToLongBits(this.delta) >>> 32));
+//            return hash;
+//        }
+//        
+//        @Override
+//        public String toString(){
+//            return String.format("[Markierung: %s%s, %f]", (edgeDirection==FORWARD)?"+":"-",(prev==null)?"null":prev.toString(), delta);
+//        }
+//    }
 }

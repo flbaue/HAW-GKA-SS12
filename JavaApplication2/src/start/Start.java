@@ -29,7 +29,7 @@ public class Start {
         DefaultDirectedWeightedFlowGraph<String, DefaultWeightedEdge> p3_directed_cities = new DefaultDirectedWeightedFlowGraph<>(GraphParser.<DefaultWeightedEdge>parseDirected("src/graphFiles/graph_08.graph"));
         DefaultDirectedWeightedFlowGraph<String, DefaultWeightedEdge> p3_directed_cities2 = new DefaultDirectedWeightedFlowGraph<>(GraphParser.<DefaultWeightedEdge>parseDirected("src/graphFiles/graph_08.graph"));
         
-        System.out.println(p3_directed_cities);
+       // System.out.println(p3_directed_cities);
 
         //Praktikum 1
 //        System.out.println(new Breitensuche(p1_undirected_cities));
@@ -125,8 +125,8 @@ public class Start {
         //Praktikum 3
         
         System.out.println(new Ford_Fulkerson(p3_directed_cities));
-        System.out.println(p3_directed_cities2.edgesOf("Dortmund"));
         EdmondsKarp ek1 = new EdmondsKarp(p3_directed_cities2, "Rostock", "München");
+        System.out.println(ek1.maxFlow());
         
 
 
