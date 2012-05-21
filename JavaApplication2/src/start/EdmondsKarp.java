@@ -190,7 +190,7 @@ public class EdmondsKarp<V, E> {
         return new HashSet<>(a);
     }
 
-    public Set<V> getaComplement() {
+    public Set<V> getAComplement() {
         return new HashSet<>(aComplement);
     }
 
