@@ -61,7 +61,7 @@ public class Ford_Fulkerson<V, E> {
             if (TRACE) System.err.println(String.format("Inspecting %s:", verticesToInspect.get(0).toString()));
 //            (b) Wähle aus der List die markierte, aber noch nicht inspizierte Ecke v_i
 //                und inspiziere sie wie folgt (Berechnung des Inkrements)
-            V v_i = verticesToInspect.get(0);
+            V v_i = verticesToInspect.remove(0);
             
             
 //            (Vorwärtskante) Für jede Kante e_ij ∈ O(v_i ) mit unmarkierter
@@ -102,7 +102,6 @@ public class Ford_Fulkerson<V, E> {
                     }
                 }
             }
-            // why is this here ??
             inspectedVertices.add(v_i);
             
 //            Falls s markiert ist, gehe zu 3., sonst zu 2.(a).
