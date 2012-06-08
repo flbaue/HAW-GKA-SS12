@@ -9,6 +9,7 @@ package start;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import org.jgrapht.UndirectedGraph;
 import org.jgrapht.WeightedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import utils.DefaultDirectedWeightedFlowGraph;
@@ -28,7 +29,7 @@ public class Start {
         WeightedGraph<String, DefaultWeightedEdge> p2_directed_negCircle = GraphParser.parseDirected("src/graphFiles/graph_07.graph");
         DefaultDirectedWeightedFlowGraph<String, DefaultWeightedEdge> p3_directed_cities = new DefaultDirectedWeightedFlowGraph<>(GraphParser.<DefaultWeightedEdge>parseDirected("src/graphFiles/graph_08.graph"));
         DefaultDirectedWeightedFlowGraph<String, DefaultWeightedEdge> p3_directed_cities2 = new DefaultDirectedWeightedFlowGraph<>(GraphParser.<DefaultWeightedEdge>parseDirected("src/graphFiles/graph_08.graph"));
-        
+        UndirectedGraph<String, DefaultWeightedEdge> p4_eulersch = GraphParser.parseUndirected("src/graphFiles/eulersch.graph");
        // System.out.println(p3_directed_cities);
 
         //Praktikum 1
@@ -124,12 +125,16 @@ public class Start {
         
         //Praktikum 3
         
-        EdmondsKarp ek1 = new EdmondsKarp(p3_directed_cities2, "Rostock", "München");
-        System.out.println(ek1);
-        Ford_Fulkerson fF1 = new Ford_Fulkerson(p3_directed_cities2, "Rostock", "München");
-        System.out.println(fF1);
+//        EdmondsKarp ek1 = new EdmondsKarp(p3_directed_cities2, "Rostock", "München");
+//        System.out.println(ek1);
+//        Ford_Fulkerson fF1 = new Ford_Fulkerson(p3_directed_cities2, "Rostock", "München");
+//        System.out.println(fF1);
         
-
+        //Praktikum 4
+       // Hierholzer<String, DefaultWeightedEdge> hierholzer = new Hierholzer<>(p1_undirected_cities);
+         Hierholzer hierholzer = new Hierholzer(p4_eulersch);
+         System.out.println(hierholzer.getEulerCircle().getEdgeList());
+        
 
         //Sandbox
 
