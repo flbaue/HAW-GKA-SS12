@@ -6,9 +6,6 @@
  */
 package start;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 import org.jgrapht.UndirectedGraph;
 import org.jgrapht.WeightedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
@@ -132,8 +129,9 @@ public class Start {
         
         //Praktikum 4
        // Hierholzer<String, DefaultWeightedEdge> hierholzer = new Hierholzer<>(p1_undirected_cities);
-         Hierholzer hierholzer = new Hierholzer(p4_eulersch);
+         Hierholzer<String, DefaultWeightedEdge> hierholzer = new Hierholzer<>(p4_eulersch);
          System.out.println(hierholzer.getEulerCircle().getEdgeList());
+         System.out.println(hierholzer);
         
 
         //Sandbox
