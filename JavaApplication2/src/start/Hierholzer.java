@@ -97,8 +97,8 @@ public class Hierholzer<V, E extends DefaultWeightedEdge> {
             //current vertex, which will be cchecked
             V current = start;
             
-            //The Neigbor of the befor checked current vertex
-            V neighbor = null;
+            //The Neigbor of the befor checked current vertex. In the beginning, it's null
+            V neighbor;
             
 
             if (TRACE) System.err.println("-> Wurden bereits alle Kanten besucht? ");
@@ -145,7 +145,9 @@ public class Hierholzer<V, E extends DefaultWeightedEdge> {
                     //set current for the next run of this while-loop
                     current = neighbor;
                     if (TRACE) System.err.println("-----> Gefunde Nachbarecke:: " + neighbor);
+                    
                 } while (!start.equals(neighbor));
+                
                 if (TRACE) System.err.println("--->ENDE: Ermittlen eines 'Unterkreises'");
                 if (TRACE) System.err.println("--->START: Zusammmenfügen der Kreise");
                 if (TRACE) System.err.println("----> Aktuelle Eulerkreis-Ecken: " + completeCircle);
@@ -165,7 +167,8 @@ public class Hierholzer<V, E extends DefaultWeightedEdge> {
                 if (TRACE) System.err.println("---> Ende: Zusammmenfügen der Kreise");
                 if (TRACE) System.err.println("-> Wurden bereits alle Kanten besucht? ");
 
-                
+                //Search for the first vertex with a degree != 0 ( <=> >0, beacause degree is never negative)
+                // to start with this edge for the next inner-cirle search.
                 Iterator<V> it = completeCircle.iterator();
                 boolean vertexDegreeNEzeroFound = false;
                 while (it.hasNext() && !vertexDegreeNEzeroFound) {
@@ -173,24 +176,29 @@ public class Hierholzer<V, E extends DefaultWeightedEdge> {
                     if (!workingGraph.edgesOf(vertex).isEmpty()) {
                         start = vertex;
                         current = vertex;
-                        vertexDegreeNEzeroFound = false;
+                        vertexDegreeNEzeroFound = true;
                     }
                 }
             }
+            
             if (TRACE) System.err.println("--> JA!");
             if (TRACE) System.err.println("-> Eckenliste für Eulerkreis: " + completeCircle);
             if (TRACE) System.err.println(">ENDE: Ermitteln des Eulerkreises. <");
+            
         }
-        if (TRACE) System.err.println(">START: Pfad erzeugen. <");
-        if (TRACE) System.err.println("-> START: Kanten ermitteln. <");
+        
+        if (TRACE) System.err.println(">START: Kreis-Pfad erzeugen. <");
+        if (TRACE) System.err.println("->START: Kanten ermitteln. <");
 
+        //collect edges of the euler tour (based on the vertices)
         List<E> edges = new ArrayList<>();
         for (int i = 0; i < completeCircle.size() - 1; i++) {
             edges.add(originalgraph.getEdge(completeCircle.get(i), completeCircle.get(i + 1)));
         }
-        if (TRACE) {
-            System.err.println("--> Kanten des Eulerkreises: " + completeCircle);
-        }
+        
+        if (TRACE) System.err.println("--> Kanten des Eulerkreises: " + completeCircle);
+        
+        //get start vertex of the euler tour, if a tour exists
         V v;
         if (completeCircle.isEmpty()) {
             v = null;
@@ -198,10 +206,10 @@ public class Hierholzer<V, E extends DefaultWeightedEdge> {
             v = completeCircle.get(0);
         }
 
+        //create a new circle-object for the instance-variable
         this.circle = new Circle<>(originalgraph, v, edges);
-        if (TRACE) {
-            System.err.println(">START: Pfad erzeugen. <");
-        }
+        
+        if (TRACE) System.err.println(">ENDE: Kreis-Pfad erzeugen. <");
     }
 
     public boolean hasEulertour() {
