@@ -5,6 +5,7 @@
 package start;
 
 import java.util.*;
+import org.jgraph.graph.Edge;
 import utils.FlowGraph;
 import utils.Marks;
 
@@ -14,13 +15,13 @@ import utils.Marks;
  */
 public class Ford_Fulkerson<V, E> {
 
-    private final boolean TRACE = false;
+    private final boolean TRACE = true;
     private final FlowGraph<V, E> graph;
     private final V source;
     private final V target;
     private final double maxFlow;
-    private final Set<V> a;
-    private final Set<V> aComplement;
+    private final Set<V> x;
+    private final Set<V> xComplement;
     private final Set<E> minCut;
     private final Set<E> minCutOutgoing;
     private final Set<E> minCutIncomming;
@@ -53,7 +54,7 @@ public class Ford_Fulkerson<V, E> {
         //#2. Inspektion und Markierung#
         //##############################
         
-//        (a) Falls alle markierten Ecken inspiziert wurden, gehe nach 4.
+//        (x) Falls alle markierten Ecken inspiziert wurden, gehe nach 4.
         while(!inspectedVertices.containsAll(markedVertices.keySet())){
            // List schlurfen
             Collections.shuffle(verticesToInspect);
@@ -102,9 +103,10 @@ public class Ford_Fulkerson<V, E> {
                     }
                 }
             }
+            
             inspectedVertices.add(v_i);
             
-//            Falls s markiert ist, gehe zu 3., sonst zu 2.(a).
+//            Falls s markiert ist, gehe zu 3., sonst zu 2.(x).
             if (markedVertices.containsKey(target)) {
                 //################################
                 //#3. Vergrößerung der Flußstärke#
@@ -131,6 +133,7 @@ public class Ford_Fulkerson<V, E> {
                 markedVertices.put(source, new Marks(Marks.FORWARD, null, Double.POSITIVE_INFINITY));
                 verticesToInspect.add(source);
             }
+            
         }
         
         //###########################
@@ -147,12 +150,20 @@ public class Ford_Fulkerson<V, E> {
         }
         this.maxFlow = tmpFlow;
         
-        // a:
-        this.a = new HashSet<>(markedVertices.keySet());
+        // maxFlow:
+        tmpFlow=0;
+        for (E edge : graph.incomingEdgesOf(this.target)) {
+            tmpFlow += graph.getEdgeFlow(edge);
+        }
+        double targetInFlow = tmpFlow;
+        
+        
+        // x:
+        this.x = new HashSet<>(inspectedVertices);
 
-        // aComplement:
-        this.aComplement = new HashSet<>(graph.vertexSet());
-        this.aComplement.removeAll(a);
+        // xComplement:
+        this.xComplement = new HashSet<>(graph.vertexSet());
+        this.xComplement.removeAll(x);
         
         // minCutIncomming
         this.minCutIncomming = calcMinCutIncoming();
@@ -163,14 +174,24 @@ public class Ford_Fulkerson<V, E> {
         // minCut:
         this.minCut = calcMinCut();
         
+        if (TRACE) for (E e : minCut) {
+            if (graph.getEdgeFlow(e)!=graph.getEdgeCapacity(e)){
+                System.err.println(" FEHLER: Flow != Capacity für Schnitt-Kante "+e+": Flow = "+graph.getEdgeFlow(e)+" Capacity = "+graph.getEdgeCapacity(e));
+            }
+        }
+        
         // minCutCapacity
         this.minCutCapacity = calcMinCutCapacity();
         
         //Berechnung von MaxFlow, basierend auf dem minimalen Schnitt (dient eher der Kontrolle)
         double maxFlowOfCut = calcMaxFlowBasedOnMinCut();
         
+      
+        
         checkMaxFlowMinCutTheorem();
         
+        if (TRACE) System.err.println(" X: "+x); 
+        if (TRACE) System.err.println(" complement(X): "+xComplement);
         if (TRACE) System.err.println(" Zu inspizierende Ecken: "+verticesToInspect);
         if (TRACE) System.err.println(" Inspizierte Ecken: "+inspectedVertices);
         if (TRACE) System.err.println(" Markierte Ecken: "+markedVertices);
@@ -180,6 +201,7 @@ public class Ford_Fulkerson<V, E> {
         if (TRACE) System.err.println(" MinCutIncoming: " + minCutIncomming);
         if (TRACE) System.err.println(" MinCutCapacity: "+ minCutCapacity);
         if (TRACE) System.err.println(" MaxFlow, calculated based on source outgoing flow: "+ maxFlow);
+        if (TRACE) System.err.println(" MaxFlow, calculated based on target incoming flow: "+ targetInFlow);
         if (TRACE) System.err.println(" MinFlow, calculated based on minCut: "+maxFlowOfCut);
     }
     
@@ -189,11 +211,11 @@ public class Ford_Fulkerson<V, E> {
     }
 
     public Set<V> getA() {
-        return new HashSet<>(a);
+        return new HashSet<>(x);
     }
 
     public Set<V> getAComplement() {
-        return new HashSet<>(aComplement);
+        return new HashSet<>(xComplement);
     }
 
     public Set<E> getMinCut() {
@@ -227,29 +249,29 @@ public class Ford_Fulkerson<V, E> {
     }
 
     private Set<E> calcMinCutIncoming() {
-        Set<E> result = new HashSet<>();
-        for (V v1 : a) {
-            Set<E> v1In = new HashSet<>(graph.incomingEdgesOf(v1));
-            for (V v2 : aComplement) {
-                Set<E> v2Out = new HashSet<>(graph.outgoingEdgesOf(v2));
-                v2Out.retainAll(v1In);
-                result.addAll(v2Out);
-            }
+        Set<E> aIn = new HashSet<>();
+        for (V v1 : x) {
+            aIn.addAll(graph.incomingEdgesOf(v1));
         }
-        return result;
+        Set<E> aCOut = new HashSet<>();
+        for (V v2 : xComplement) {
+            aCOut.addAll(graph.outgoingEdgesOf(v2));
+        }
+        aIn.retainAll(aCOut);
+        return aIn;
     }
 
     private Set<E> calcMinCutOutgoing() {
-        Set<E> result = new HashSet<>();
-        for (V v1 : a) {
-            Set<E> v1Out = new HashSet<>(graph.outgoingEdgesOf(v1));
-            for (V v2 : aComplement) {
-                Set<E> v2In = new HashSet<>(graph.incomingEdgesOf(v2));
-                v2In.retainAll(v1Out);
-                result.addAll(v2In);
-            }
+        Set<E> aOut = new HashSet<>();
+        for (V v1 : x) {
+            aOut.addAll(graph.outgoingEdgesOf(v1));
         }
-        return result;
+        Set<E> aCIn = new HashSet<>();
+        for (V v2 : xComplement) {
+            aCIn.addAll(graph.incomingEdgesOf(v2));
+        }
+        aOut.retainAll(aCIn);
+        return aOut;
     }
 
     private double calcMinCutCapacity() {
@@ -277,8 +299,10 @@ public class Ford_Fulkerson<V, E> {
     private void checkMaxFlowMinCutTheorem() {
         boolean conditionResult = (maxFlow == minCutCapacity);
         if (!conditionResult){
-            throw new Error("Maximaler-Fluss-Minimaler-Schnitt-Theorem ist nicht erfüllt. Werte sind nicht gleich!");
+//            throw new Error("Maximaler-Fluss-Minimaler-Schnitt-Theorem ist nicht erfüllt. Werte sind nicht gleich!");
+        System.err.println("ERROOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOR");
         }
+        
     }
     
     @Override

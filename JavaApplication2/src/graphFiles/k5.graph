@@ -1,0 +1,11 @@
+#ungerichtet
+A,B,5
+B,C,35
+C,D,25
+D,E,50
+E,A,20
+A,C,10
+A,D,15
+B,E,45
+B,D,40
+E,C,30
