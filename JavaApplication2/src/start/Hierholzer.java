@@ -226,7 +226,7 @@ public class Hierholzer<V, E extends DefaultWeightedEdge> {
         if (!hasEulertour) {
             result = "No Euler-Tour found!";
         } else {
-            result = String.format("Euler-Tour={start/end: %s; edges: }", circle.getEdgeList().toString());
+            result = String.format("Euler-Tour={start/end: %s; edges: %s}", circle.getStartEndVertex().toString(), circle.getEdgeList().toString());
         }
         return result;
     }

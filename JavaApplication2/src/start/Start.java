@@ -27,6 +27,9 @@ public class Start {
         DefaultDirectedWeightedFlowGraph<String, DefaultWeightedEdge> p3_directed_cities = new DefaultDirectedWeightedFlowGraph<>(GraphParser.<DefaultWeightedEdge>parseDirected("src/graphFiles/graph_08.graph"));
         DefaultDirectedWeightedFlowGraph<String, DefaultWeightedEdge> p3_directed_cities2 = new DefaultDirectedWeightedFlowGraph<>(GraphParser.<DefaultWeightedEdge>parseDirected("src/graphFiles/graph_08.graph"));
         UndirectedGraph<String, DefaultWeightedEdge> p4_eulersch = GraphParser.parseUndirected("src/graphFiles/eulersch.graph");
+        UndirectedGraph<String, DefaultWeightedEdge> p4_eulersch_k5 = GraphParser.parseUndirected("src/graphFiles/k5.graph");
+        UndirectedGraph<String, DefaultWeightedEdge> p4_eulersch_big = GraphParser.parseUndirected("src/graphFiles/big_eulersch.graph");
+        
        // System.out.println(p3_directed_cities);
 
         //Praktikum 1
@@ -133,7 +136,13 @@ public class Start {
          System.out.println(hierholzer.getEulerCircle().getEdgeList());
          System.out.println(hierholzer);
         
-
+         Hierholzer<String, DefaultWeightedEdge> hierholzer2 = new Hierholzer<>(p4_eulersch_k5);
+         System.out.println(hierholzer2);
+         
+         Hierholzer<String, DefaultWeightedEdge> hierholzer3 = new Hierholzer<>(p4_eulersch_big);
+         System.out.println(hierholzer3);
+         
+         
         //Sandbox
 
     }
