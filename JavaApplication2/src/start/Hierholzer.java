@@ -21,7 +21,7 @@ public class Hierholzer<V, E extends DefaultWeightedEdge> {
 
     //Change to true, to show trace information.
     // Helpful to debug or understand algorithm
-    private final static boolean TRACE = true;
+    private final static boolean TRACE = false;
     
     //Change to true, to ensure, diffrent results, if they exists.
     // False will not ensure to get allways the same result because of the use
@@ -38,11 +38,13 @@ public class Hierholzer<V, E extends DefaultWeightedEdge> {
     private final Circle<V, E> circle;
 
     public Hierholzer(UndirectedGraph<V, E> g) {
-
+        if (TRACE)System.err.println("    __________\n"
+                                    +"___/HIERHOLZER\\___\n"
+                                    +"|================|");
         this.originalgraph = g;
         UndirectedGraph<V, DefaultWeightedEdge> workingGraph = new ListenableUndirectedGraph<>(DefaultWeightedEdge.class);
 
-        if (TRACE)System.err.println(">START: Überprüfung, ob Graph eulersch ist. <");
+        if (TRACE)System.err.println(">START: Überprüfung, ob Graph eulersch ist.<");
 
         boolean hE = true;
         //Pruefen, ob es Ecken gibt, die einen ungeraden Eckengrad haben,
@@ -61,7 +63,7 @@ public class Hierholzer<V, E extends DefaultWeightedEdge> {
             }
         }
         if (TRACE && hE) System.err.println("-> Graph ist eulersch!");
-        if (TRACE) System.err.println(">ENDE: Überprüfung, ob Graph eulersch ist. <");
+        if (TRACE) System.err.println(">ENDE: Überprüfung, ob Graph eulersch ist.<");
 
         //Seting the instance variable to its final value
         this.hasEulertour = hE;
@@ -69,7 +71,7 @@ public class Hierholzer<V, E extends DefaultWeightedEdge> {
         //List, that contains all vetrices of the euler tour
         List<V> completeCircle = new ArrayList<>();
 
-        if (TRACE) System.err.println(">START: Ermitteln des Eulerkreises. <");
+        if (TRACE) System.err.println(">START: Ermitteln des Eulerkreises.<");
         
         //we only need to find an euler tour, if one exists...
         if (hasEulertour) {
@@ -101,7 +103,7 @@ public class Hierholzer<V, E extends DefaultWeightedEdge> {
             V neighbor;
             
 
-            if (TRACE) System.err.println("-> Wurden bereits alle Kanten besucht? ");
+            if (TRACE) System.err.println("-> Wurden bereits alle Kanten besucht?");
             
             //Solange noch nicht über alle Kanten gelaufen wurde (und diese aus dem
             // Graph gelöscht wurden) wird weiter nach Kreisen gesucht.
@@ -113,7 +115,7 @@ public class Hierholzer<V, E extends DefaultWeightedEdge> {
                 List<V> innerCircle = new ArrayList<>();
                 innerCircle.add(start);
                 
-                if (TRACE) System.err.println("--->START: Ermittlen eines 'Unterkreises'");
+                if (TRACE) System.err.println("--->START: Ermittlen eines 'Unterkreises'<");
                 if (TRACE) System.err.println("----> Startecke für nächsten 'Unterkreis': " + start);
                 
                 //Diese Schleife läuft so lange, bis ein Kreis gefunden wurde, mindestens aber einmal.
@@ -148,8 +150,8 @@ public class Hierholzer<V, E extends DefaultWeightedEdge> {
                     
                 } while (!start.equals(neighbor));
                 
-                if (TRACE) System.err.println("--->ENDE: Ermittlen eines 'Unterkreises'");
-                if (TRACE) System.err.println("--->START: Zusammmenfügen der Kreise");
+                if (TRACE) System.err.println("--->ENDE: Ermittlen eines 'Unterkreises'<");
+                if (TRACE) System.err.println("--->START: Zusammmenfügen der Kreise<");
                 if (TRACE) System.err.println("----> Aktuelle Eulerkreis-Ecken: " + completeCircle);
                 if (TRACE) System.err.println("----> Aktuelle 'Unterkreis'-Ecken: " + innerCircle);
                 
@@ -183,12 +185,12 @@ public class Hierholzer<V, E extends DefaultWeightedEdge> {
             
             if (TRACE) System.err.println("--> JA!");
             if (TRACE) System.err.println("-> Eckenliste für Eulerkreis: " + completeCircle);
-            if (TRACE) System.err.println(">ENDE: Ermitteln des Eulerkreises. <");
+            if (TRACE) System.err.println(">ENDE: Ermitteln des Eulerkreises.<");
             
         }
         
-        if (TRACE) System.err.println(">START: Kreis-Pfad erzeugen. <");
-        if (TRACE) System.err.println("->START: Kanten ermitteln. <");
+        if (TRACE) System.err.println(">START: Kreis-Pfad erzeugen.<");
+        if (TRACE) System.err.println("->START: Kanten ermitteln.<");
 
         //collect edges of the euler tour (based on the vertices)
         List<E> edges = new ArrayList<>();
@@ -196,7 +198,7 @@ public class Hierholzer<V, E extends DefaultWeightedEdge> {
             edges.add(originalgraph.getEdge(completeCircle.get(i), completeCircle.get(i + 1)));
         }
         
-        if (TRACE) System.err.println("--> Kanten des Eulerkreises: " + completeCircle);
+        if (TRACE) System.err.println("--> Kanten des Eulerkreises: " + edges);
         
         //get start vertex of the euler tour, if a tour exists
         V v;
@@ -209,7 +211,7 @@ public class Hierholzer<V, E extends DefaultWeightedEdge> {
         //create a new circle-object for the instance-variable
         this.circle = new Circle<>(originalgraph, v, edges);
         
-        if (TRACE) System.err.println(">ENDE: Kreis-Pfad erzeugen. <");
+        if (TRACE) System.err.println(">ENDE: Kreis-Pfad erzeugen.<");
     }
 
     public boolean hasEulertour() {
