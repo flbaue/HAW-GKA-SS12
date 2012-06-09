@@ -9,6 +9,7 @@ package start;
 import org.jgrapht.UndirectedGraph;
 import org.jgrapht.WeightedGraph;
 import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.ListenableUndirectedWeightedGraph;
 import utils.DefaultDirectedWeightedFlowGraph;
 import utils.GraphParser;
 
@@ -17,7 +18,7 @@ public class Start {
     public static void main(String[] args) {
 
         //Graphen
-        WeightedGraph<String, DefaultWeightedEdge> p1_undirected_cities = GraphParser.parseUndirected("src/graphFiles/graph_01.graph");
+        ListenableUndirectedWeightedGraph<String, DefaultWeightedEdge> p1_undirected_cities = GraphParser.parseUndirected("src/graphFiles/graph_01.graph");
         WeightedGraph<String, DefaultWeightedEdge> p2_undirected_cities = GraphParser.parseUndirected("src/graphFiles/graph_02.graph");
         WeightedGraph<String, DefaultWeightedEdge> p2_directed = GraphParser.parseDirected("src/graphFiles/graph_03.graph");
         WeightedGraph<String, DefaultWeightedEdge> p2_undirected_negCircle = GraphParser.parseUndirected("src/graphFiles/graph_04.graph");
@@ -141,6 +142,9 @@ public class Start {
          
          Hierholzer<String, DefaultWeightedEdge> hierholzer3 = new Hierholzer<>(p4_eulersch_big);
          System.out.println(hierholzer3);
+         
+         Hierholzer<String, DefaultWeightedEdge> hierholzer_nichtEulersch = new Hierholzer<>(p1_undirected_cities);
+         System.out.println(hierholzer_nichtEulersch);
          
          
         //Sandbox
