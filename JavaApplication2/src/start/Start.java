@@ -30,6 +30,8 @@ public class Start {
         UndirectedGraph<String, DefaultWeightedEdge> p4_eulersch = GraphParser.parseUndirected("src/graphFiles/eulersch.graph");
         UndirectedGraph<String, DefaultWeightedEdge> p4_eulersch_k5 = GraphParser.parseUndirected("src/graphFiles/k5.graph");
         UndirectedGraph<String, DefaultWeightedEdge> p4_eulersch_big = GraphParser.parseUndirected("src/graphFiles/big_eulersch.graph");
+        UndirectedGraph<String, DefaultWeightedEdge> k5_undirected_vollstandig = GraphParser.parseUndirected("src/graphFiles/k5.graph");
+        UndirectedGraph<String, DefaultWeightedEdge> k7_undirected_vollstandig = GraphParser.parseUndirected("src/graphFiles/k7.graph");
         
        // System.out.println(p3_directed_cities);
 
@@ -146,7 +148,13 @@ public class Start {
          Hierholzer<String, DefaultWeightedEdge> hierholzer_nichtEulersch = new Hierholzer<>(p1_undirected_cities);
          System.out.println(hierholzer_nichtEulersch);
          
-         
+         //Nearest Insertion
+         System.out.println("    ___________________________\n"
+                                    +"___/Nearest Neighbour Insertion\\___\n");
+         NearestNeighbourInsertion tour1 = new NearestNeighbourInsertion(k5_undirected_vollstandig,"A");
+         System.out.println(tour1);
+         NearestNeighbourInsertion tour2 = new NearestNeighbourInsertion(k7_undirected_vollstandig,"A");
+         System.out.println(tour2);
         //Sandbox
 
     }
