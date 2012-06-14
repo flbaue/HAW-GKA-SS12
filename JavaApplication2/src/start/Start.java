@@ -151,8 +151,15 @@ public class Start {
          //Nearest Insertion
          System.out.println("    ___________________________\n"
                                     +"___/Nearest Neighbour Insertion\\___\n");
+         
+         System.out.println("k5 undirected Vollstandig..... Start Ecke A");
+         System.out.println("");
          NearestNeighbourInsertion tour1 = new NearestNeighbourInsertion(k5_undirected_vollstandig,"A");
          System.out.println(tour1);
+         
+         System.out.println("");
+         System.out.println("k7 undirected Vollstandig..... Start Ecke A");
+         System.out.println("");
          NearestNeighbourInsertion tour2 = new NearestNeighbourInsertion(k7_undirected_vollstandig,"A");
          System.out.println(tour2);
         //Sandbox
