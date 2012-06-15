@@ -32,6 +32,8 @@ public class Start {
         UndirectedGraph<String, DefaultWeightedEdge> p4_eulersch_big = GraphParser.parseUndirected("src/graphFiles/big_eulersch.graph");
         UndirectedGraph<String, DefaultWeightedEdge> k5_undirected_vollstandig = GraphParser.parseUndirected("src/graphFiles/k5.graph");
         UndirectedGraph<String, DefaultWeightedEdge> k7_undirected_vollstandig = GraphParser.parseUndirected("src/graphFiles/k7.graph");
+        ListenableUndirectedWeightedGraph<String, DefaultWeightedEdge> p4_graph10 = GraphParser.parseUndirected("src/graphFiles/graph_10.graph");
+        ListenableUndirectedWeightedGraph<String, DefaultWeightedEdge> p4_graph11 = GraphParser.parseUndirected("src/graphFiles/graph_11.graph");
         
        // System.out.println(p3_directed_cities);
 
@@ -148,20 +150,31 @@ public class Start {
          Hierholzer<String, DefaultWeightedEdge> hierholzer_nichtEulersch = new Hierholzer<>(p1_undirected_cities);
          System.out.println(hierholzer_nichtEulersch);
          
+         Hierholzer<String, DefaultWeightedEdge> hierholzer4 = new Hierholzer<>(p4_graph10);
+         System.out.println(hierholzer4);
+         
+         Hierholzer<String, DefaultWeightedEdge> hierholzer5 = new Hierholzer<>(p4_graph10);
+         System.out.println(hierholzer5);
+         
          //Nearest Insertion
          System.out.println("    ___________________________\n"
                                     +"___/Nearest Neighbour Insertion\\___\n");
          
          System.out.println("k5 undirected Vollstandig..... Start Ecke A");
          System.out.println("");
-         NearestNeighbourInsertion tour1 = new NearestNeighbourInsertion(k5_undirected_vollstandig,"A");
+         NearestNeighbourInsertion tour1 = new NearestNeighbourInsertion<>(k5_undirected_vollstandig,"A");
          System.out.println(tour1);
          
          System.out.println("");
          System.out.println("k7 undirected Vollstandig..... Start Ecke A");
          System.out.println("");
-         NearestNeighbourInsertion tour2 = new NearestNeighbourInsertion(k7_undirected_vollstandig,"A");
+         NearestNeighbourInsertion tour2 = new NearestNeighbourInsertion<>(k7_undirected_vollstandig,"A");
          System.out.println(tour2);
+         
+         System.out.println("\nNeue Graphen 10 und 11");
+         System.out.println(new NearestNeighbourInsertion<>(p4_graph10, "v1") );
+         System.out.println(new NearestNeighbourInsertion<>(p4_graph11, "v2") );
+         
         //Sandbox
 
     }
