@@ -70,11 +70,11 @@ public class Hierholzer<V, E extends DefaultWeightedEdge> {
 
         //List, that contains all vetrices of the euler tour
         List<V> completeCircle = new ArrayList<>();
-
-        if (TRACE) System.err.println(">START: Ermitteln des Eulerkreises.<");
         
         //we only need to find an euler tour, if one exists...
         if (hasEulertour) {
+            
+            if (TRACE) System.err.println(">START: Ermitteln des Eulerkreises.<");
 
             if (TRACE) System.err.println("-> Vorbereitungen...");
             
@@ -96,7 +96,7 @@ public class Hierholzer<V, E extends DefaultWeightedEdge> {
             if (RANDOMIZE) Collections.shuffle(vertices);
             V start = vertices.get(0);
             
-            //current vertex, which will be cchecked
+            //current vertex, which will be checked
             V current = start;
             
             //The Neigbor of the befor checked current vertex. In the beginning, it's null

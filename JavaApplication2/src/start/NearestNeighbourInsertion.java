@@ -4,10 +4,11 @@
  */
 package start;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.jgrapht.Graph;
-import org.jgrapht.GraphPath;
-import org.jgrapht.graph.GraphPathImpl;
 
 /**
  *
@@ -19,7 +20,7 @@ public class NearestNeighbourInsertion<V, E> {
     private final V startVertex;
     private final List<E> allEdges;
     private final List<V> allVertex;
-    private boolean LOG = true;
+    private boolean LOG = false;
     private List<V> gebliebenenEcken;
     private Map<List<V>, Double> result;
 
@@ -80,10 +81,10 @@ public class NearestNeighbourInsertion<V, E> {
         // Kürzeste Kreis distance initialisieren
         double minDistance = Double.MAX_VALUE;
 
-        // Die neugefügte Ecke speichern
+        // Die neugefügte dichteste Ecke speichern
         final V neuHinzugefuegteEcke = mainTour.get(mainTour.size() - 1);
 
-        //Kreis Builden,Tour in Kreis umwandeln. (Start Ecke hinzufügen List[0])
+        //Kreis Builden,Tour in Kreis umwandeln (. (Start Ecke hinzufügen List[0])
         mainTour.add(startVertex);
         double tempDistance = 0;
 
@@ -96,13 +97,16 @@ public class NearestNeighbourInsertion<V, E> {
             // Kantenfolge distance rechnen 
             tempDistance = kantenFolgeDistanceRechnen(mainTour);
 
+            if (LOG) {
+                System.out.println("Tour: " + mainTour + " Distance: " + tempDistance);
+            }
             // distance und kreis ersetzen wenn kleiner gefunden
             if (tempDistance <= minDistance) {
                 minDistance = tempDistance;
                 kuerzesteKreis = new ArrayList<>(mainTour);
             }
 
-            //neue Ecke Platz tauschen
+            //neue Ecke Platz tauschen, permütation
             // Bsp.: neue Ecke = E
             //[A,B,C,D,E,A]
             //[A,B,C,E,D,A]
@@ -113,7 +117,7 @@ public class NearestNeighbourInsertion<V, E> {
             mainTour.add(eckeIndex - 1, neuHinzugefuegteEcke);
         }
         if (LOG) {
-            System.out.println("kürzeste Kreis: " + kuerzesteKreis + " ,Distance = " + (minDistance== Double.MAX_VALUE? tempDistance : minDistance));
+            System.out.println("kürzeste Kreis: " + kuerzesteKreis + " ,Distance = " + (minDistance == Double.MAX_VALUE ? tempDistance : minDistance));
         }
         return kuerzesteKreis;
     }
@@ -123,7 +127,7 @@ public class NearestNeighbourInsertion<V, E> {
         // distance initialisieren
         double distance = 0;
 
-        // loop über alle Ecken, stelle Kanten und gewichte zusammen rechnen
+        // loop über alle Ecken, und addiere Gewicht aller Kanten
         for (int i = 0; i <= mainTour.size() - 2; i++) {
 
             // wenn FirstEcke und SecondEcke gleich sind => distance = 0
@@ -157,7 +161,7 @@ public class NearestNeighbourInsertion<V, E> {
                 }
             }
             if (LOG) {
-                System.out.print("nächste dichteste Ecke = " + dichtestenEcke + "  ");
+                System.out.println("nächste dichteste Ecke = " + dichtestenEcke + "  ");
             }
             return dichtestenEcke;
         } else {
@@ -166,8 +170,10 @@ public class NearestNeighbourInsertion<V, E> {
         }
     }
 
+    // Suche nach dem Entry der den kompleten Kreis enthält
     private Map.Entry<List<V>, Double> getTour() {
         for (Map.Entry<List<V>, Double> entry : result.entrySet()) {
+            
             if (entry.getKey().size() - 1 == allVertex.size()) {
                 return entry;
             }
